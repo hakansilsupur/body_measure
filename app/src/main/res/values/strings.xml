@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Body Measure</string>
+
+    <string name="tab_add">Record</string>
+    <string name="tab_history">History</string>
+
+    <string name="weight_kg">Weight (kg)</string>
+    <string name="height_cm">Height (cm)</string>
+    <string name="waist_cm">Waist (cm)</string>
+    <string name="arm_cm">Arm (cm)</string>
+    <string name="chest_cm">Chest (cm)</string>
+    <string name="hip_cm">Hip (cm)</string>
+    <string name="thigh_cm">Thigh (cm)</string>
+    <string name="neck_cm">Neck (cm)</string>
+
+    <string name="save">Save</string>
+    <string name="clear">Clear</string>
+    <string name="delete">Delete</string>
+    <string name="bmi">BMI</string>
+
+    <string name="bmi_underweight">Underweight</string>
+    <string name="bmi_normal">Normal</string>
+    <string name="bmi_overweight">Overweight</string>
+    <string name="bmi_obese">Obese</string>
+
+    <string name="error_required_weight_height">Weight and height are required</string>
+    <string name="error_invalid_number">Please enter valid positive numbers</string>
+    <string name="empty_history">No measurements yet. Record your first one!</string>
+    <string name="saved">Saved</string>
+    <string name="deleted">Entry deleted</string>
+</resources>
