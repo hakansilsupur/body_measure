@@ -6,9 +6,10 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
 ## Features
 
 - Record weight & height — BMI is computed automatically.
-- Optional measurements: waist, arm, chest, hip, thigh, neck (all in cm).
-- Live BMI preview as you type, with color-coded category:
-  Underweight / Normal / Overweight / Obese (WHO ranges).
+- Optional measurements: neck, waist, hip, chest, arm, thigh (all in cm).
+- Body-fat % (U.S. Navy tape method) computed automatically when the required
+  measurements are present.
+- Live BMI **and** body-fat preview as you type, both color-coded.
 - History of all entries, sorted newest first, with per-entry delete.
 - Local-only storage via Room — no network, no accounts.
 - Material 3 UI with dynamic color (Android 12+) and dark mode.
@@ -77,3 +78,30 @@ The APK is unsigned debug — fine for personal use, not for the Play Store.
 
 BMI is a screening tool, not a diagnosis. It does not differentiate fat from
 muscle and is not appropriate for athletes, pregnant individuals, or children.
+
+## Body-fat reference (U.S. Navy method)
+
+Body fat % is estimated from height, neck circumference, and waist
+circumference. For females the formula also requires hip circumference.
+
+```
+Male:    %BF = 495 / (1.0324 − 0.19077·log10(waist−neck) + 0.15456·log10(height)) − 450
+Female:  %BF = 495 / (1.29579 − 0.35004·log10(waist+hip−neck) + 0.22100·log10(height)) − 450
+```
+(All circumferences in cm.)
+
+ACE category ranges:
+
+| Category   | Men         | Women       |
+|------------|-------------|-------------|
+| Essential  | 2 – 5 %     | 10 – 13 %   |
+| Athletes   | 6 – 13 %    | 14 – 20 %   |
+| Fitness    | 14 – 17 %   | 21 – 24 %   |
+| Average    | 18 – 24 %   | 25 – 31 %   |
+| Obese      | ≥ 25 %      | ≥ 32 %      |
+
+The Navy formula is an estimate (~3–4 % error vs. DEXA) and is not a substitute
+for a clinical body-composition assessment.
+
+> Note: arm, chest, and thigh measurements are recorded for tracking only —
+> they are not part of the Navy body-fat formula.

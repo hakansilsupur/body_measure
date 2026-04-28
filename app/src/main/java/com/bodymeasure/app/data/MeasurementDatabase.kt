@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Measurement::class], version = 1, exportSchema = false)
+@Database(entities = [Measurement::class], version = 2, exportSchema = false)
 abstract class MeasurementDatabase : RoomDatabase() {
 
     abstract fun measurementDao(): MeasurementDao
@@ -19,7 +19,11 @@ abstract class MeasurementDatabase : RoomDatabase() {
                     context.applicationContext,
                     MeasurementDatabase::class.java,
                     "body_measure.db"
-                ).build().also { instance = it }
+                )
+                    // Pre-release: schema additions (sex, bodyFatPct) wipe the DB.
+                    .fallbackToDestructiveMigration()
+                    .build()
+                    .also { instance = it }
             }
     }
 }

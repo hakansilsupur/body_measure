@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class Measurement(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val timestamp: Long = System.currentTimeMillis(),
+    val sex: String = "Male",
     val weightKg: Double,
     val heightCm: Double,
     val waistCm: Double? = null,
@@ -15,5 +16,6 @@ data class Measurement(
     val hipCm: Double? = null,
     val thighCm: Double? = null,
     val neckCm: Double? = null,
-    val bmi: Double
+    val bmi: Double,
+    val bodyFatPct: Double? = null
 )

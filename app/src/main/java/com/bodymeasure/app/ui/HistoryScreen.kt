@@ -27,6 +27,9 @@ import com.bodymeasure.app.R
 import com.bodymeasure.app.data.Measurement
 import com.bodymeasure.app.util.Bmi
 import com.bodymeasure.app.util.BmiCategory
+import com.bodymeasure.app.util.BodyFat
+import com.bodymeasure.app.util.BodyFatCategory
+import com.bodymeasure.app.util.Sex
 import java.text.DateFormat
 import java.util.Date
 
@@ -57,13 +60,25 @@ fun HistoryScreen(
 
 @Composable
 private fun MeasurementRow(m: Measurement, onDelete: () -> Unit) {
-    val category = Bmi.categorize(m.bmi)
-    val (catLabel, catColor) = when (category) {
+    val bmiCategory = Bmi.categorize(m.bmi)
+    val (catLabel, catColor) = when (bmiCategory) {
         BmiCategory.Underweight -> stringResource(R.string.bmi_underweight) to Color(0xFF42A5F5)
         BmiCategory.Normal -> stringResource(R.string.bmi_normal) to Color(0xFF43A047)
         BmiCategory.Overweight -> stringResource(R.string.bmi_overweight) to Color(0xFFFB8C00)
         BmiCategory.Obese -> stringResource(R.string.bmi_obese) to Color(0xFFE53935)
     }
+    val sex = runCatching { Sex.valueOf(m.sex) }.getOrDefault(Sex.Male)
+    val bf = m.bodyFatPct
+    val (bfLabel, bfColor) = bf?.let { BodyFat.categorize(sex, it) }?.let {
+        when (it) {
+            BodyFatCategory.Essential -> stringResource(R.string.bf_essential) to Color(0xFF42A5F5)
+            BodyFatCategory.Athletes -> stringResource(R.string.bf_athletes) to Color(0xFF26A69A)
+            BodyFatCategory.Fitness -> stringResource(R.string.bf_fitness) to Color(0xFF43A047)
+            BodyFatCategory.Average -> stringResource(R.string.bf_average) to Color(0xFFFB8C00)
+            BodyFatCategory.Obese -> stringResource(R.string.bf_obese) to Color(0xFFE53935)
+        }
+    } ?: ("" to Color.Unspecified)
+
     val df = rememberDateFormat()
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -86,6 +101,21 @@ private fun MeasurementRow(m: Measurement, onDelete: () -> Unit) {
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                     }
+                    if (bf != null) {
+                        Row(verticalAlignment = Alignment.Bottom) {
+                            Text(
+                                "BF ${BodyFat.format(bf)}%",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = bfColor
+                            )
+                            Text(
+                                "  $bfLabel",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = bfColor,
+                                modifier = Modifier.padding(bottom = 2.dp)
+                            )
+                        }
+                    }
                 }
                 IconButton(onClick = onDelete) {
                     Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
@@ -106,12 +136,12 @@ private fun MeasurementRow(m: Measurement, onDelete: () -> Unit) {
 @Composable
 private fun FlowStats(m: Measurement) {
     val pairs = listOfNotNull(
+        m.neckCm?.let { "Neck" to "${fmt(it)} cm" },
         m.waistCm?.let { "Waist" to "${fmt(it)} cm" },
-        m.armCm?.let { "Arm" to "${fmt(it)} cm" },
-        m.chestCm?.let { "Chest" to "${fmt(it)} cm" },
         m.hipCm?.let { "Hip" to "${fmt(it)} cm" },
-        m.thighCm?.let { "Thigh" to "${fmt(it)} cm" },
-        m.neckCm?.let { "Neck" to "${fmt(it)} cm" }
+        m.chestCm?.let { "Chest" to "${fmt(it)} cm" },
+        m.armCm?.let { "Arm" to "${fmt(it)} cm" },
+        m.thighCm?.let { "Thigh" to "${fmt(it)} cm" }
     )
     if (pairs.isEmpty()) return
     Column(modifier = Modifier.padding(top = 6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {

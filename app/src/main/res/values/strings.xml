@@ -5,6 +5,10 @@
     <string name="tab_add">Record</string>
     <string name="tab_history">History</string>
 
+    <string name="sex">Sex</string>
+    <string name="sex_male">Male</string>
+    <string name="sex_female">Female</string>
+
     <string name="weight_kg">Weight (kg)</string>
     <string name="height_cm">Height (cm)</string>
     <string name="waist_cm">Waist (cm)</string>
@@ -17,12 +21,22 @@
     <string name="save">Save</string>
     <string name="clear">Clear</string>
     <string name="delete">Delete</string>
-    <string name="bmi">BMI</string>
 
+    <string name="bmi">BMI</string>
     <string name="bmi_underweight">Underweight</string>
     <string name="bmi_normal">Normal</string>
     <string name="bmi_overweight">Overweight</string>
     <string name="bmi_obese">Obese</string>
+
+    <string name="body_fat">Body fat</string>
+    <string name="body_fat_short">BF</string>
+    <string name="bf_essential">Essential</string>
+    <string name="bf_athletes">Athletes</string>
+    <string name="bf_fitness">Fitness</string>
+    <string name="bf_average">Average</string>
+    <string name="bf_obese">Obese</string>
+    <string name="bf_hint_male">Body fat needs height, neck and waist</string>
+    <string name="bf_hint_female">Body fat needs height, neck, waist and hip</string>
 
     <string name="error_required_weight_height">Weight and height are required</string>
     <string name="error_invalid_number">Please enter valid positive numbers</string>
