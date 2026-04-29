@@ -7,6 +7,7 @@ import com.bodymeasure.app.data.Measurement
 import com.bodymeasure.app.data.MeasurementDatabase
 import com.bodymeasure.app.data.MeasurementRepository
 import com.bodymeasure.app.util.Bmi
+import com.bodymeasure.app.util.Bmr
 import com.bodymeasure.app.util.BodyFat
 import com.bodymeasure.app.util.Sex
 import kotlinx.coroutines.flow.SharingStarted
@@ -33,6 +34,7 @@ class MeasurementViewModel(app: Application) : AndroidViewModel(app) {
 
     fun save(
         sex: Sex,
+        ageYears: Int?,
         weightKg: Double,
         heightCm: Double,
         waist: Double?,
@@ -55,8 +57,10 @@ class MeasurementViewModel(app: Application) : AndroidViewModel(app) {
             waistCm = waist,
             hipCm = hip
         )
+        val bmr = Bmr.calculate(sex, weightKg, heightCm, ageYears)
         val entry = Measurement(
             sex = sex.name,
+            ageYears = ageYears,
             weightKg = weightKg,
             heightCm = heightCm,
             waistCm = waist,
@@ -66,7 +70,8 @@ class MeasurementViewModel(app: Application) : AndroidViewModel(app) {
             thighCm = thigh,
             neckCm = neck,
             bmi = bmi,
-            bodyFatPct = bodyFat
+            bodyFatPct = bodyFat,
+            bmrKcal = bmr
         )
         viewModelScope.launch {
             repo.save(entry)

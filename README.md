@@ -9,7 +9,8 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
 - Optional measurements: neck, waist, hip, chest, arm, thigh (all in cm).
 - Body-fat % (U.S. Navy tape method) computed automatically when the required
   measurements are present.
-- Live BMI **and** body-fat preview as you type, both color-coded.
+- BMR (Mifflin-St Jeor) computed when age, weight, and height are present.
+- Live BMI / body-fat / BMR preview as you type, all color-coded.
 - History of all entries, sorted newest first, with per-entry delete.
 - Local-only storage via Room — no network, no accounts.
 - Material 3 UI with dynamic color (Android 12+) and dark mode.
@@ -105,3 +106,26 @@ for a clinical body-composition assessment.
 
 > Note: arm, chest, and thigh measurements are recorded for tracking only —
 > they are not part of the Navy body-fat formula.
+
+## BMR reference (Mifflin-St Jeor)
+
+Basal Metabolic Rate is the daily calories your body burns at complete rest.
+Inputs: sex, age (years), weight (kg), height (cm).
+
+```
+Male:    BMR = 10·kg + 6.25·cm − 5·years + 5
+Female:  BMR = 10·kg + 6.25·cm − 5·years − 161
+```
+
+Multiply BMR by an activity factor to get **TDEE** (Total Daily Energy
+Expenditure) — the calories needed to maintain weight:
+
+| Activity level                       | Factor |
+|--------------------------------------|--------|
+| Sedentary (desk job, no exercise)    | 1.2    |
+| Lightly active (1–3 workouts / week) | 1.375  |
+| Moderately active (3–5 / week)       | 1.55   |
+| Very active (6–7 / week)             | 1.725  |
+| Extremely active (physical job)      | 1.9    |
+
+The app currently shows BMR only; TDEE multiplication is left for the user.

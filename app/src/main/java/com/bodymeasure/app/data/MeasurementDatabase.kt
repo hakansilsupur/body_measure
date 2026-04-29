@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Measurement::class], version = 2, exportSchema = false)
+@Database(entities = [Measurement::class], version = 3, exportSchema = false)
 abstract class MeasurementDatabase : RoomDatabase() {
 
     abstract fun measurementDao(): MeasurementDao
@@ -20,7 +20,7 @@ abstract class MeasurementDatabase : RoomDatabase() {
                     MeasurementDatabase::class.java,
                     "body_measure.db"
                 )
-                    // Pre-release: schema additions (sex, bodyFatPct) wipe the DB.
+                    // Pre-release: schema additions wipe the DB on version bump.
                     .fallbackToDestructiveMigration()
                     .build()
                     .also { instance = it }

@@ -27,6 +27,7 @@ import com.bodymeasure.app.R
 import com.bodymeasure.app.data.Measurement
 import com.bodymeasure.app.util.Bmi
 import com.bodymeasure.app.util.BmiCategory
+import com.bodymeasure.app.util.Bmr
 import com.bodymeasure.app.util.BodyFat
 import com.bodymeasure.app.util.BodyFatCategory
 import com.bodymeasure.app.util.Sex
@@ -116,6 +117,13 @@ private fun MeasurementRow(m: Measurement, onDelete: () -> Unit) {
                             )
                         }
                     }
+                    m.bmrKcal?.let { bmr ->
+                        Text(
+                            "BMR ${Bmr.format(bmr)} ${stringResource(R.string.bmr_unit)}",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
                 IconButton(onClick = onDelete) {
                     Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
@@ -136,6 +144,7 @@ private fun MeasurementRow(m: Measurement, onDelete: () -> Unit) {
 @Composable
 private fun FlowStats(m: Measurement) {
     val pairs = listOfNotNull(
+        m.ageYears?.let { "Age" to "$it y" },
         m.neckCm?.let { "Neck" to "${fmt(it)} cm" },
         m.waistCm?.let { "Waist" to "${fmt(it)} cm" },
         m.hipCm?.let { "Hip" to "${fmt(it)} cm" },

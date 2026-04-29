@@ -8,6 +8,7 @@ data class Measurement(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val timestamp: Long = System.currentTimeMillis(),
     val sex: String = "Male",
+    val ageYears: Int? = null,
     val weightKg: Double,
     val heightCm: Double,
     val waistCm: Double? = null,
@@ -17,5 +18,6 @@ data class Measurement(
     val thighCm: Double? = null,
     val neckCm: Double? = null,
     val bmi: Double,
-    val bodyFatPct: Double? = null
+    val bodyFatPct: Double? = null,
+    val bmrKcal: Double? = null
 )

@@ -9,6 +9,7 @@
     <string name="sex_male">Male</string>
     <string name="sex_female">Female</string>
 
+    <string name="age_years">Age (years)</string>
     <string name="weight_kg">Weight (kg)</string>
     <string name="height_cm">Height (cm)</string>
     <string name="waist_cm">Waist (cm)</string>
@@ -37,6 +38,10 @@
     <string name="bf_obese">Obese</string>
     <string name="bf_hint_male">Body fat needs height, neck and waist</string>
     <string name="bf_hint_female">Body fat needs height, neck, waist and hip</string>
+
+    <string name="bmr">BMR</string>
+    <string name="bmr_unit">kcal/day</string>
+    <string name="bmr_hint">BMR needs age, weight and height</string>
 
     <string name="error_required_weight_height">Weight and height are required</string>
     <string name="error_invalid_number">Please enter valid positive numbers</string>
