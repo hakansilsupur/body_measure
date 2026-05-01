@@ -125,10 +125,8 @@ fun AddMeasurementScreen(
         ActivitySelector(activity = activity, onChange = { activity = it })
 
         IntegerField(value = age, onChange = { age = it }, label = stringResource(R.string.age_years))
-        NumberField(value = weight, onChange = { weight = it }, label = stringResource(R.string.weight_kg),
-            onInfoClick = { openGuide = MeasurementGuide.Weight })
-        NumberField(value = height, onChange = { height = it }, label = stringResource(R.string.height_cm),
-            onInfoClick = { openGuide = MeasurementGuide.Height })
+        NumberField(value = weight, onChange = { weight = it }, label = stringResource(R.string.weight_kg))
+        NumberField(value = height, onChange = { height = it }, label = stringResource(R.string.height_cm))
         NumberField(value = neck, onChange = { neck = it }, label = stringResource(R.string.neck_cm),
             onInfoClick = { openGuide = MeasurementGuide.Neck })
         NumberField(value = waist, onChange = { waist = it }, label = stringResource(R.string.waist_cm),

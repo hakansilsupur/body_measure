@@ -149,7 +149,33 @@ dependency.
 
 ## How-to-measure tutorials
 
-Each measurement field on the Record screen has a small ⓘ icon. Tapping it
-opens a dialog with a vector illustration showing exactly where to place the
-tape, plus a short text instruction. Available for: weight, height, neck,
-waist, hip, chest, arm, thigh.
+The six tape-measurement fields (neck, waist, hip, chest, arm, thigh) on the
+Record screen each show a small ⓘ icon. Tapping it opens a dialog with a
+photo of the technique and short text instructions.
+
+### Setting up the photos
+
+Photos are loaded **from URLs at runtime** rather than bundled into the app —
+this keeps you in control of which images are used and respects their
+licenses. By default the URLs are empty and the dialog renders a "no image
+set" placeholder so the text instructions still display.
+
+To wire up real photos:
+
+1. Open `app/src/main/java/com/bodymeasure/app/ui/MeasurementGuide.kt`.
+2. For each entry (`Neck`, `Waist`, …), set `imageUrl` to a direct image URL
+   (must end in `.jpg`, `.png`, etc., not a webpage that *contains* an image).
+3. If the image requires attribution (e.g. CC-BY-SA), set `attribution` to
+   the credit string — it's rendered under the photo.
+4. Rebuild.
+
+Suggested sources of freely-licensed photos:
+
+- **Wikimedia Commons** (CC-BY-SA / CC0) — use the *Special:FilePath* URL,
+  e.g. `https://commons.wikimedia.org/wiki/Special:FilePath/<filename>.jpg`
+- **Pexels / Unsplash / Pixabay** — generally free for commercial use,
+  attribution optional but appreciated. Use the direct CDN image URL.
+- Your own photos hosted on a static URL (GitHub Pages, an S3 bucket, etc.).
+
+Don't paste random image URLs from a Google search — those are typically
+copyrighted stock photos and embedding them in an app would be infringement.
