@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.bodymeasure.app.data.Measurement
 import com.bodymeasure.app.data.MeasurementDatabase
 import com.bodymeasure.app.data.MeasurementRepository
+import com.bodymeasure.app.util.ActivityLevel
 import com.bodymeasure.app.util.Bmi
 import com.bodymeasure.app.util.Bmr
 import com.bodymeasure.app.util.BodyFat
@@ -35,6 +36,7 @@ class MeasurementViewModel(app: Application) : AndroidViewModel(app) {
     fun save(
         sex: Sex,
         ageYears: Int?,
+        activity: ActivityLevel?,
         weightKg: Double,
         heightCm: Double,
         waist: Double?,
@@ -71,7 +73,8 @@ class MeasurementViewModel(app: Application) : AndroidViewModel(app) {
             neckCm = neck,
             bmi = bmi,
             bodyFatPct = bodyFat,
-            bmrKcal = bmr
+            bmrKcal = bmr,
+            activityFactor = activity?.factor
         )
         viewModelScope.launch {
             repo.save(entry)

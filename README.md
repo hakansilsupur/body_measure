@@ -10,7 +10,12 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
 - Body-fat % (U.S. Navy tape method) computed automatically when the required
   measurements are present.
 - BMR (Mifflin-St Jeor) computed when age, weight, and height are present.
-- Live BMI / body-fat / BMR preview as you type, all color-coded.
+- TDEE = BMR × activity factor (5 activity levels) when an activity level is
+  picked.
+- Live BMI / body-fat / BMR / TDEE preview card as you type.
+- **Trends tab** with three line charts (BMI, body fat %, BMR) drawn over time.
+- **How-to-measure illustrations**: tap the info icon next to any measurement
+  field to see a small diagram and instructions for proper tape placement.
 - History of all entries, sorted newest first, with per-entry delete.
 - Local-only storage via Room — no network, no accounts.
 - Material 3 UI with dynamic color (Android 12+) and dark mode.
@@ -128,4 +133,23 @@ Expenditure) — the calories needed to maintain weight:
 | Very active (6–7 / week)             | 1.725  |
 | Extremely active (physical job)      | 1.9    |
 
-The app currently shows BMR only; TDEE multiplication is left for the user.
+When an activity level is picked, the preview card shows both BMR and TDEE,
+and history entries are stored with their activity factor.
+
+## Trends
+
+The **Trends** tab shows three line charts side by side:
+
+1. BMI over time
+2. Body-fat % over time (only entries where it could be computed)
+3. BMR (kcal/day) over time
+
+Charts are rendered with native Compose Canvas — no third-party charting
+dependency.
+
+## How-to-measure tutorials
+
+Each measurement field on the Record screen has a small ⓘ icon. Tapping it
+opens a dialog with a vector illustration showing exactly where to place the
+tape, plus a short text instruction. Available for: weight, height, neck,
+waist, hip, chest, arm, thigh.

@@ -1,6 +1,7 @@
 package com.bodymeasure.app.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,9 +12,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -25,6 +34,7 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -34,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.bodymeasure.app.R
+import com.bodymeasure.app.util.ActivityLevel
 import com.bodymeasure.app.util.Bmi
 import com.bodymeasure.app.util.BmiCategory
 import com.bodymeasure.app.util.Bmr
@@ -46,6 +57,7 @@ fun AddMeasurementScreen(
     onSave: (
         sex: Sex,
         ageYears: Int?,
+        activity: ActivityLevel?,
         weightKg: Double,
         heightCm: Double,
         waist: Double?,
@@ -59,6 +71,7 @@ fun AddMeasurementScreen(
     showMessage: (String) -> Unit
 ) {
     var sex by rememberSaveable { mutableStateOf(Sex.Male) }
+    var activity by rememberSaveable { mutableStateOf<ActivityLevel?>(null) }
     var age by rememberSaveable { mutableStateOf("") }
     var weight by rememberSaveable { mutableStateOf("") }
     var height by rememberSaveable { mutableStateOf("") }
@@ -68,6 +81,11 @@ fun AddMeasurementScreen(
     var hip by rememberSaveable { mutableStateOf("") }
     var thigh by rememberSaveable { mutableStateOf("") }
     var neck by rememberSaveable { mutableStateOf("") }
+    var openGuide by rememberSaveable { mutableStateOf<MeasurementGuide?>(null) }
+
+    openGuide?.let { guide ->
+        MeasurementGuideDialog(guide = guide, onDismiss = { openGuide = null })
+    }
 
     val ageI = age.toIntOrNull()
     val weightD = weight.toDoubleOrNull()
@@ -82,6 +100,7 @@ fun AddMeasurementScreen(
         BodyFat.calculate(sex, heightD, neckD, waistD, hipD) else null
     val livePreviewBmr = if (weightD != null && heightD != null)
         Bmr.calculate(sex, weightD, heightD, ageI) else null
+    val livePreviewTdee = Bmr.tdee(livePreviewBmr, activity?.factor)
 
     val savedLabel = stringResource(R.string.saved)
     val errInvalid = stringResource(R.string.error_invalid_number)
@@ -98,20 +117,30 @@ fun AddMeasurementScreen(
             bmi = livePreviewBmi,
             sex = sex,
             bodyFat = livePreviewBodyFat,
-            bmrKcal = livePreviewBmr
+            bmrKcal = livePreviewBmr,
+            tdeeKcal = livePreviewTdee
         )
 
         SexSelector(sex = sex, onChange = { sex = it })
+        ActivitySelector(activity = activity, onChange = { activity = it })
 
         IntegerField(value = age, onChange = { age = it }, label = stringResource(R.string.age_years))
-        NumberField(value = weight, onChange = { weight = it }, label = stringResource(R.string.weight_kg))
-        NumberField(value = height, onChange = { height = it }, label = stringResource(R.string.height_cm))
-        NumberField(value = neck, onChange = { neck = it }, label = stringResource(R.string.neck_cm))
-        NumberField(value = waist, onChange = { waist = it }, label = stringResource(R.string.waist_cm))
-        NumberField(value = hip, onChange = { hip = it }, label = stringResource(R.string.hip_cm))
-        NumberField(value = chest, onChange = { chest = it }, label = stringResource(R.string.chest_cm))
-        NumberField(value = arm, onChange = { arm = it }, label = stringResource(R.string.arm_cm))
-        NumberField(value = thigh, onChange = { thigh = it }, label = stringResource(R.string.thigh_cm))
+        NumberField(value = weight, onChange = { weight = it }, label = stringResource(R.string.weight_kg),
+            onInfoClick = { openGuide = MeasurementGuide.Weight })
+        NumberField(value = height, onChange = { height = it }, label = stringResource(R.string.height_cm),
+            onInfoClick = { openGuide = MeasurementGuide.Height })
+        NumberField(value = neck, onChange = { neck = it }, label = stringResource(R.string.neck_cm),
+            onInfoClick = { openGuide = MeasurementGuide.Neck })
+        NumberField(value = waist, onChange = { waist = it }, label = stringResource(R.string.waist_cm),
+            onInfoClick = { openGuide = MeasurementGuide.Waist })
+        NumberField(value = hip, onChange = { hip = it }, label = stringResource(R.string.hip_cm),
+            onInfoClick = { openGuide = MeasurementGuide.Hip })
+        NumberField(value = chest, onChange = { chest = it }, label = stringResource(R.string.chest_cm),
+            onInfoClick = { openGuide = MeasurementGuide.Chest })
+        NumberField(value = arm, onChange = { arm = it }, label = stringResource(R.string.arm_cm),
+            onInfoClick = { openGuide = MeasurementGuide.Arm })
+        NumberField(value = thigh, onChange = { thigh = it }, label = stringResource(R.string.thigh_cm),
+            onInfoClick = { openGuide = MeasurementGuide.Thigh })
 
         Text(
             text = stringResource(
@@ -149,6 +178,7 @@ fun AddMeasurementScreen(
                     onSave(
                         sex,
                         age.toIntOrNull(),
+                        activity,
                         w, h,
                         waist.toDoubleOrNull(),
                         arm.toDoubleOrNull(),
@@ -162,7 +192,6 @@ fun AddMeasurementScreen(
                                 showMessage(savedLabel)
                                 weight = ""; height = ""; waist = ""; arm = ""
                                 chest = ""; hip = ""; thigh = ""; neck = ""
-                                // intentionally keep `age` populated for the next entry
                             }
                             is SaveResult.Error -> showMessage(result.message)
                             SaveResult.Idle -> Unit
@@ -202,7 +231,62 @@ private fun SexSelector(sex: Sex, onChange: (Sex) -> Unit) {
 }
 
 @Composable
-private fun NumberField(value: String, onChange: (String) -> Unit, label: String) {
+private fun ActivitySelector(activity: ActivityLevel?, onChange: (ActivityLevel?) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Column {
+        Text(
+            stringResource(R.string.activity),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+        Box(modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(
+                onClick = { expanded = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = activity?.let { "${it.displayName}  ×${it.factor}" }
+                        ?: stringResource(R.string.activity_none),
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.activity_none)) },
+                    onClick = { onChange(null); expanded = false }
+                )
+                ActivityLevel.entries.forEach { level ->
+                    DropdownMenuItem(
+                        text = {
+                            Column {
+                                Text("${level.displayName}  ×${level.factor}")
+                                Text(
+                                    level.description,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        },
+                        onClick = { onChange(level); expanded = false }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun NumberField(
+    value: String,
+    onChange: (String) -> Unit,
+    label: String,
+    onInfoClick: (() -> Unit)? = null
+) {
     OutlinedTextField(
         value = value,
         onValueChange = { input ->
@@ -217,6 +301,16 @@ private fun NumberField(value: String, onChange: (String) -> Unit, label: String
         label = { Text(label) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+        trailingIcon = onInfoClick?.let { handler ->
+            {
+                IconButton(onClick = handler) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = stringResource(R.string.how_to_measure)
+                    )
+                }
+            }
+        },
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -234,7 +328,13 @@ private fun IntegerField(value: String, onChange: (String) -> Unit, label: Strin
 }
 
 @Composable
-private fun PreviewCard(bmi: Double?, sex: Sex, bodyFat: Double?, bmrKcal: Double?) {
+private fun PreviewCard(
+    bmi: Double?,
+    sex: Sex,
+    bodyFat: Double?,
+    bmrKcal: Double?,
+    tdeeKcal: Double?
+) {
     val bmiCat = bmi?.let { Bmi.categorize(it) }
     val (bmiLabel, bmiColor) = when (bmiCat) {
         BmiCategory.Underweight -> stringResource(R.string.bmi_underweight) to Color(0xFF42A5F5)
@@ -254,38 +354,49 @@ private fun PreviewCard(bmi: Double?, sex: Sex, bodyFat: Double?, bmrKcal: Doubl
     }
     val bmrColor = if (bmrKcal != null) MaterialTheme.colorScheme.primary
                    else MaterialTheme.colorScheme.outline
+    val tdeeColor = if (tdeeKcal != null) MaterialTheme.colorScheme.tertiary
+                    else MaterialTheme.colorScheme.outline
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp, horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            MetricColumn(
-                title = stringResource(R.string.bmi),
-                valueText = bmi?.let(Bmi::format) ?: "—",
-                category = bmiLabel,
-                color = bmiColor,
-                modifier = Modifier.weight(1f)
-            )
-            VerticalDivider(modifier = Modifier.height(72.dp))
-            MetricColumn(
-                title = stringResource(R.string.body_fat),
-                valueText = bodyFat?.let { "${BodyFat.format(it)}%" } ?: "—",
-                category = bfLabel,
-                color = bfColor,
-                modifier = Modifier.weight(1f)
-            )
-            VerticalDivider(modifier = Modifier.height(72.dp))
-            MetricColumn(
-                title = stringResource(R.string.bmr),
-                valueText = bmrKcal?.let(Bmr::format) ?: "—",
-                category = stringResource(R.string.bmr_unit),
-                color = bmrColor,
-                modifier = Modifier.weight(1f)
-            )
+        Column(modifier = Modifier.padding(vertical = 12.dp, horizontal = 8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                MetricColumn(
+                    title = stringResource(R.string.bmi),
+                    valueText = bmi?.let(Bmi::format) ?: "—",
+                    subtitle = bmiLabel,
+                    color = bmiColor,
+                    modifier = Modifier.weight(1f)
+                )
+                VerticalDivider(modifier = Modifier.height(64.dp))
+                MetricColumn(
+                    title = stringResource(R.string.body_fat),
+                    valueText = bodyFat?.let { "${BodyFat.format(it)}%" } ?: "—",
+                    subtitle = bfLabel,
+                    color = bfColor,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                MetricColumn(
+                    title = stringResource(R.string.bmr),
+                    valueText = bmrKcal?.let(Bmr::format) ?: "—",
+                    subtitle = stringResource(R.string.bmr_unit),
+                    color = bmrColor,
+                    modifier = Modifier.weight(1f)
+                )
+                VerticalDivider(modifier = Modifier.height(64.dp))
+                MetricColumn(
+                    title = stringResource(R.string.tdee),
+                    valueText = tdeeKcal?.let(Bmr::format) ?: "—",
+                    subtitle = stringResource(R.string.bmr_unit),
+                    color = tdeeColor,
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
     }
 }
@@ -294,7 +405,7 @@ private fun PreviewCard(bmi: Double?, sex: Sex, bodyFat: Double?, bmrKcal: Doubl
 private fun MetricColumn(
     title: String,
     valueText: String,
-    category: String,
+    subtitle: String,
     color: Color,
     modifier: Modifier = Modifier
 ) {
@@ -304,6 +415,6 @@ private fun MetricColumn(
     ) {
         Text(title, style = MaterialTheme.typography.labelLarge)
         Text(valueText, style = MaterialTheme.typography.titleLarge, color = color)
-        Text(category, style = MaterialTheme.typography.labelSmall, color = color)
+        Text(subtitle, style = MaterialTheme.typography.labelSmall, color = color)
     }
 }

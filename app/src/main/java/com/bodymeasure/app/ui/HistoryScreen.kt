@@ -118,11 +118,21 @@ private fun MeasurementRow(m: Measurement, onDelete: () -> Unit) {
                         }
                     }
                     m.bmrKcal?.let { bmr ->
-                        Text(
-                            "BMR ${Bmr.format(bmr)} ${stringResource(R.string.bmr_unit)}",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                        val tdee = Bmr.tdee(bmr, m.activityFactor)
+                        if (tdee != null) {
+                            Text(
+                                "TDEE ${Bmr.format(tdee)} ${stringResource(R.string.bmr_unit)}" +
+                                    "  (BMR ${Bmr.format(bmr)})",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
+                        } else {
+                            Text(
+                                "BMR ${Bmr.format(bmr)} ${stringResource(R.string.bmr_unit)}",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
                 IconButton(onClick = onDelete) {

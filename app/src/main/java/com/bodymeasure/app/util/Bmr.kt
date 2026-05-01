@@ -2,6 +2,19 @@ package com.bodymeasure.app.util
 
 import kotlin.math.roundToInt
 
+enum class ActivityLevel(val factor: Double, val displayName: String, val description: String) {
+    Sedentary(1.2, "Sedentary", "Desk job, no exercise"),
+    Light(1.375, "Light", "1–3 workouts / week"),
+    Moderate(1.55, "Moderate", "3–5 workouts / week"),
+    Active(1.725, "Active", "6–7 workouts / week"),
+    Extreme(1.9, "Extreme", "Hard daily training / physical job");
+
+    companion object {
+        fun fromFactor(factor: Double?): ActivityLevel? =
+            factor?.let { f -> entries.firstOrNull { kotlin.math.abs(it.factor - f) < 0.001 } }
+    }
+}
+
 object Bmr {
 
     /**
@@ -20,6 +33,12 @@ object Bmr {
             Sex.Female -> base - 161.0
         }
         return if (bmr > 0 && bmr.isFinite()) bmr else null
+    }
+
+    /** TDEE = BMR × activity factor. Null if either input is missing. */
+    fun tdee(bmrKcal: Double?, activityFactor: Double?): Double? {
+        if (bmrKcal == null || activityFactor == null || activityFactor <= 0) return null
+        return bmrKcal * activityFactor
     }
 
     fun format(kcal: Double): String = kcal.roundToInt().toString()

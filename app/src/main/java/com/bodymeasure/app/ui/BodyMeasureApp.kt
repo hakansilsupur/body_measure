@@ -1,10 +1,12 @@
 package com.bodymeasure.app.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -31,7 +33,7 @@ import com.bodymeasure.app.R
 import com.bodymeasure.app.ui.theme.BodyMeasureTheme
 import kotlinx.coroutines.launch
 
-private enum class Tab { Add, History }
+private enum class Tab { Add, History, Trends }
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -68,6 +70,12 @@ fun BodyMeasureApp() {
                             icon = { Icon(Icons.Default.History, contentDescription = null) },
                             label = { Text(stringResource(R.string.tab_history)) }
                         )
+                        NavigationBarItem(
+                            selected = tab == Tab.Trends,
+                            onClick = { tab = Tab.Trends },
+                            icon = { Icon(Icons.Default.ShowChart, contentDescription = null) },
+                            label = { Text(stringResource(R.string.tab_trends)) }
+                        )
                     }
                 },
                 snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -75,7 +83,7 @@ fun BodyMeasureApp() {
                 val showMessage: (String) -> Unit = { msg ->
                     scope.launch { snackbarHostState.showSnackbar(msg) }
                 }
-                androidx.compose.foundation.layout.Box(Modifier.padding(padding)) {
+                Box(Modifier.padding(padding)) {
                     when (tab) {
                         Tab.Add -> AddMeasurementScreen(
                             onSave = vm::save,
@@ -88,6 +96,7 @@ fun BodyMeasureApp() {
                                 showMessage("Entry deleted")
                             }
                         )
+                        Tab.Trends -> TrendsScreen(items = history)
                     }
                 }
             }

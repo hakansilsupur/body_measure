@@ -19,5 +19,6 @@ data class Measurement(
     val neckCm: Double? = null,
     val bmi: Double,
     val bodyFatPct: Double? = null,
-    val bmrKcal: Double? = null
+    val bmrKcal: Double? = null,
+    val activityFactor: Double? = null
 )

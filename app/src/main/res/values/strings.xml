@@ -43,9 +43,47 @@
     <string name="bmr_unit">kcal/day</string>
     <string name="bmr_hint">BMR needs age, weight and height</string>
 
+    <string name="tdee">TDEE</string>
+    <string name="activity">Activity</string>
+    <string name="activity_none">None (BMR only)</string>
+
+    <string name="tab_trends">Trends</string>
+    <string name="trends_bmi">BMI over time</string>
+    <string name="trends_body_fat">Body fat % over time</string>
+    <string name="trends_bmr">BMR (kcal/day) over time</string>
+    <string name="chart_need_two">Add at least two entries to see a chart.</string>
+    <string name="chart_no_data">No data points yet.</string>
+
     <string name="error_required_weight_height">Weight and height are required</string>
     <string name="error_invalid_number">Please enter valid positive numbers</string>
     <string name="empty_history">No measurements yet. Record your first one!</string>
     <string name="saved">Saved</string>
     <string name="deleted">Entry deleted</string>
+
+    <string name="how_to_measure">How to measure</string>
+    <string name="got_it">Got it</string>
+
+    <string name="guide_weight_title">Measuring your weight</string>
+    <string name="guide_weight_text">Weigh yourself first thing in the morning, after using the bathroom and before eating or drinking. Wear minimal clothing. Place the scale on a hard, flat floor (not carpet) and stand still until the reading stabilises.</string>
+
+    <string name="guide_height_title">Measuring your height</string>
+    <string name="guide_height_text">Stand barefoot with heels, buttocks, and shoulders against a wall, eyes looking forward. Have someone place a flat object (book, ruler) on the crown of your head, mark the wall, then measure from floor to mark.</string>
+
+    <string name="guide_neck_title">Measuring your neck</string>
+    <string name="guide_neck_text">Stand relaxed with your head facing forward. Wrap the tape around the neck just below the larynx (Adam\'s apple), perpendicular to the long axis of the neck. Keep the tape level — not slanting downward at the front. Read at the end of a normal exhale.</string>
+
+    <string name="guide_waist_title">Measuring your waist</string>
+    <string name="guide_waist_text">Stand relaxed and breathe out. Wrap the tape around the natural waist — the narrowest point of the torso, typically about 2.5 cm (1 in) above the navel. Keep the tape parallel to the floor and snug, but not compressing the skin.</string>
+
+    <string name="guide_hip_title">Measuring your hips</string>
+    <string name="guide_hip_text">Stand with feet together. Wrap the tape around the widest part of your buttocks/hips — check sideways in a mirror to find it. Keep the tape level all the way around and snug, not tight.</string>
+
+    <string name="guide_chest_title">Measuring your chest</string>
+    <string name="guide_chest_text">Stand relaxed with arms at your sides. Wrap the tape around the fullest part of your chest — across the nipple line for men, across the bust for women. Keep it level all the way around and read at the end of a normal exhale.</string>
+
+    <string name="guide_arm_title">Measuring your arm</string>
+    <string name="guide_arm_text">Let the arm hang relaxed at your side. Find the midpoint between the tip of the shoulder and the elbow. Wrap the tape around the bicep at that midpoint, perpendicular to the long axis of the arm. Keep the tape snug but not compressing.</string>
+
+    <string name="guide_thigh_title">Measuring your thigh</string>
+    <string name="guide_thigh_text">Stand with weight evenly on both feet. Wrap the tape around the largest part of the upper thigh, just below the gluteal fold. Keep the tape parallel to the floor and snug, but not compressing the muscle.</string>
 </resources>
