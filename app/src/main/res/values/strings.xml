@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Body Measure</string>
+
+    <string name="tab_add">Record</string>
+    <string name="tab_history">History</string>
+
+    <string name="sex">Sex</string>
+    <string name="sex_male">Male</string>
+    <string name="sex_female">Female</string>
+
+    <string name="age_years">Age (years)</string>
+    <string name="weight_kg">Weight (kg)</string>
+    <string name="height_cm">Height (cm)</string>
+    <string name="waist_cm">Waist (cm)</string>
+    <string name="arm_cm">Arm (cm)</string>
+    <string name="chest_cm">Chest (cm)</string>
+    <string name="hip_cm">Hip (cm)</string>
+    <string name="thigh_cm">Thigh (cm)</string>
+    <string name="neck_cm">Neck (cm)</string>
+
+    <string name="save">Save</string>
+    <string name="clear">Clear</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="update">Update</string>
+    <string name="cancel">Cancel</string>
+    <string name="updated">Entry updated</string>
+    <string name="editing_entry">Editing an existing entry</string>
+
+    <string name="bmi">BMI</string>
+    <string name="bmi_underweight">Underweight</string>
+    <string name="bmi_normal">Normal</string>
+    <string name="bmi_overweight">Overweight</string>
+    <string name="bmi_obese">Obese</string>
+
+    <string name="body_fat">Body fat</string>
+    <string name="body_fat_short">BF</string>
+    <string name="bf_essential">Essential</string>
+    <string name="bf_athletes">Athletes</string>
+    <string name="bf_fitness">Fitness</string>
+    <string name="bf_average">Average</string>
+    <string name="bf_obese">Obese</string>
+    <string name="bf_hint_male">Body fat needs height, neck and waist</string>
+    <string name="bf_hint_female">Body fat needs height, neck, waist and hip</string>
+
+    <string name="bmr">BMR</string>
+    <string name="bmr_unit">kcal/day</string>
+    <string name="bmr_hint">BMR needs age, weight and height</string>
+
+    <string name="tdee">TDEE</string>
+    <string name="activity">Activity</string>
+    <string name="activity_none">None (BMR only)</string>
+
+    <string name="tab_trends">Trends</string>
+    <string name="trends_bmi">BMI over time</string>
+    <string name="trends_body_fat">Body fat % over time</string>
+    <string name="trends_bmr">BMR (kcal/day) over time</string>
+    <string name="chart_need_two">Add at least two entries to see a chart.</string>
+    <string name="chart_no_data">No data points yet.</string>
+
+    <string name="error_required_weight_height">Weight and height are required</string>
+    <string name="error_invalid_number">Please enter valid positive numbers</string>
+    <string name="empty_history">No measurements yet. Record your first one!</string>
+    <string name="saved">Saved</string>
+    <string name="deleted">Entry deleted</string>
+
+    <string name="how_to_measure">How to measure</string>
+    <string name="got_it">Got it</string>
+    <string name="guide_no_image">No image set. Add a URL in MeasurementGuide.kt to show a photo here.</string>
+    <string name="guide_image_error">Couldn\'t load image. Check the URL or your internet connection.</string>
+
+    <string name="guide_neck_title">Measuring your neck</string>
+    <string name="guide_neck_text">Stand relaxed with your head facing forward. Wrap the tape around the neck just below the larynx (Adam\'s apple), perpendicular to the long axis of the neck. Keep the tape level — not slanting downward at the front. Read at the end of a normal exhale.</string>
+
+    <string name="guide_waist_title">Measuring your waist</string>
+    <string name="guide_waist_text">Stand relaxed and breathe out. Wrap the tape around the natural waist — the narrowest point of the torso, typically about 2.5 cm (1 in) above the navel. Keep the tape parallel to the floor and snug, but not compressing the skin.</string>
+
+    <string name="guide_hip_title">Measuring your hips</string>
+    <string name="guide_hip_text">Stand with feet together. Wrap the tape around the widest part of your buttocks/hips — check sideways in a mirror to find it. Keep the tape level all the way around and snug, not tight.</string>
+
+    <string name="guide_chest_title">Measuring your chest</string>
+    <string name="guide_chest_text">Stand relaxed with arms at your sides. Wrap the tape around the fullest part of your chest — across the nipple line for men, across the bust for women. Keep it level all the way around and read at the end of a normal exhale.</string>
+
+    <string name="guide_arm_title">Measuring your arm</string>
+    <string name="guide_arm_text">Let the arm hang relaxed at your side. Find the midpoint between the tip of the shoulder and the elbow. Wrap the tape around the bicep at that midpoint, perpendicular to the long axis of the arm. Keep the tape snug but not compressing.</string>
+
+    <string name="guide_thigh_title">Measuring your thigh</string>
+    <string name="guide_thigh_text">Stand with weight evenly on both feet. Wrap the tape around the largest part of the upper thigh, just below the gluteal fold. Keep the tape parallel to the floor and snug, but not compressing the muscle.</string>
+</resources>

@@ -1,0 +1,21 @@
+# Built artifacts
+build/
+.gradle/
+local.properties
+*.apk
+*.aab
+*.ap_
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Kotlin
+.kotlin/
+
+# OS
+.DS_Store
+Thumbs.db
