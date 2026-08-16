@@ -22,6 +22,11 @@
     <string name="save">Save</string>
     <string name="clear">Clear</string>
     <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="update">Update</string>
+    <string name="cancel">Cancel</string>
+    <string name="updated">Entry updated</string>
+    <string name="editing_entry">Editing an existing entry</string>
 
     <string name="bmi">BMI</string>
     <string name="bmi_underweight">Underweight</string>

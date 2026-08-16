@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -37,7 +38,8 @@ import java.util.Date
 @Composable
 fun HistoryScreen(
     items: List<Measurement>,
-    onDelete: (Long) -> Unit
+    onDelete: (Long) -> Unit,
+    onEdit: (Measurement) -> Unit = {}
 ) {
     if (items.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
@@ -54,13 +56,14 @@ fun HistoryScreen(
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         items(items, key = { it.id }) { m ->
-            MeasurementRow(m, onDelete = { onDelete(m.id) })
+            MeasurementRow(m, onDelete = { onDelete(m.id) }, onEdit = { onEdit(m) })
         }
     }
 }
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
-private fun MeasurementRow(m: Measurement, onDelete: () -> Unit) {
+private fun MeasurementRow(m: Measurement, onDelete: () -> Unit, onEdit: () -> Unit) {
     val bmiCategory = Bmi.categorize(m.bmi)
     val (catLabel, catColor) = when (bmiCategory) {
         BmiCategory.Underweight -> stringResource(R.string.bmi_underweight) to Color(0xFF42A5F5)
@@ -82,6 +85,7 @@ private fun MeasurementRow(m: Measurement, onDelete: () -> Unit) {
 
     val df = rememberDateFormat()
     Card(
+        onClick = onEdit,
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
@@ -134,6 +138,9 @@ private fun MeasurementRow(m: Measurement, onDelete: () -> Unit) {
                             )
                         }
                     }
+                }
+                IconButton(onClick = onEdit) {
+                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
                 }
                 IconButton(onClick = onDelete) {
                     Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))

@@ -42,9 +42,14 @@ fun BodyMeasureApp() {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             val vm: MeasurementViewModel = viewModel()
             var tab by rememberSaveable { mutableStateOf(Tab.Add) }
+            var editingId by rememberSaveable { mutableStateOf<Long?>(null) }
             val snackbarHostState = remember { SnackbarHostState() }
             val scope = rememberCoroutineScope()
             val history by vm.history.collectAsState()
+
+            // Resolve the entry being edited from the live list so an external
+            // delete drops us back into "new entry" mode instead of stale state.
+            val editing = editingId?.let { id -> history.firstOrNull { it.id == id } }
 
             Scaffold(
                 topBar = {
@@ -83,17 +88,29 @@ fun BodyMeasureApp() {
                 val showMessage: (String) -> Unit = { msg ->
                     scope.launch { snackbarHostState.showSnackbar(msg) }
                 }
+                val deletedLabel = stringResource(R.string.deleted)
                 Box(Modifier.padding(padding)) {
                     when (tab) {
                         Tab.Add -> AddMeasurementScreen(
                             onSave = vm::save,
-                            showMessage = showMessage
+                            showMessage = showMessage,
+                            editing = editing,
+                            onCancelEdit = { editingId = null },
+                            onEditDone = {
+                                editingId = null
+                                tab = Tab.History
+                            }
                         )
                         Tab.History -> HistoryScreen(
                             items = history,
                             onDelete = { id ->
+                                if (editingId == id) editingId = null
                                 vm.delete(id)
-                                showMessage("Entry deleted")
+                                showMessage(deletedLabel)
+                            },
+                            onEdit = { measurement ->
+                                editingId = measurement.id
+                                tab = Tab.Add
                             }
                         )
                         Tab.Trends -> TrendsScreen(items = history)

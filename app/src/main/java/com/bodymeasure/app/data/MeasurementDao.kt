@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -15,8 +16,14 @@ interface MeasurementDao {
     @Query("SELECT * FROM measurements ORDER BY timestamp DESC LIMIT 1")
     fun observeLatest(): Flow<Measurement?>
 
+    @Query("SELECT * FROM measurements WHERE id = :id")
+    suspend fun getById(id: Long): Measurement?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(measurement: Measurement): Long
+
+    @Update
+    suspend fun update(measurement: Measurement)
 
     @Query("DELETE FROM measurements WHERE id = :id")
     suspend fun deleteById(id: Long)

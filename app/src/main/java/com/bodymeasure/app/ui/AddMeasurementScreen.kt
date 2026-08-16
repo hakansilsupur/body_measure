@@ -16,13 +16,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -44,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.bodymeasure.app.R
+import com.bodymeasure.app.data.Measurement
 import com.bodymeasure.app.util.ActivityLevel
 import com.bodymeasure.app.util.Bmi
 import com.bodymeasure.app.util.BmiCategory
@@ -52,35 +54,57 @@ import com.bodymeasure.app.util.BodyFat
 import com.bodymeasure.app.util.BodyFatCategory
 import com.bodymeasure.app.util.Sex
 
+/**
+ * Record form. When [editing] is non-null the form is prefilled with that
+ * entry's values and saving updates it in place instead of inserting a new row.
+ */
 @Composable
 fun AddMeasurementScreen(
-    onSave: (
-        sex: Sex,
-        ageYears: Int?,
-        activity: ActivityLevel?,
-        weightKg: Double,
-        heightCm: Double,
-        waist: Double?,
-        arm: Double?,
-        chest: Double?,
-        hip: Double?,
-        thigh: Double?,
-        neck: Double?,
-        onResult: (SaveResult) -> Unit
-    ) -> Unit,
-    showMessage: (String) -> Unit
+    onSave: (input: MeasurementInput, editingId: Long?, onResult: (SaveResult) -> Unit) -> Unit,
+    showMessage: (String) -> Unit,
+    editing: Measurement? = null,
+    onCancelEdit: () -> Unit = {},
+    onEditDone: () -> Unit = {}
 ) {
-    var sex by rememberSaveable { mutableStateOf(Sex.Male) }
-    var activity by rememberSaveable { mutableStateOf<ActivityLevel?>(null) }
-    var age by rememberSaveable { mutableStateOf("") }
-    var weight by rememberSaveable { mutableStateOf("") }
-    var height by rememberSaveable { mutableStateOf("") }
-    var waist by rememberSaveable { mutableStateOf("") }
-    var arm by rememberSaveable { mutableStateOf("") }
-    var chest by rememberSaveable { mutableStateOf("") }
-    var hip by rememberSaveable { mutableStateOf("") }
-    var thigh by rememberSaveable { mutableStateOf("") }
-    var neck by rememberSaveable { mutableStateOf("") }
+    // Re-key on the entry being edited so the fields reset when the target changes.
+    key(editing?.id) {
+        MeasurementForm(
+            onSave = onSave,
+            showMessage = showMessage,
+            editing = editing,
+            onCancelEdit = onCancelEdit,
+            onEditDone = onEditDone
+        )
+    }
+}
+
+@Composable
+private fun MeasurementForm(
+    onSave: (input: MeasurementInput, editingId: Long?, onResult: (SaveResult) -> Unit) -> Unit,
+    showMessage: (String) -> Unit,
+    editing: Measurement?,
+    onCancelEdit: () -> Unit,
+    onEditDone: () -> Unit
+) {
+    val isEditing = editing != null
+
+    var sex by rememberSaveable {
+        mutableStateOf(
+            editing?.sex?.let { runCatching { Sex.valueOf(it) }.getOrNull() } ?: Sex.Male
+        )
+    }
+    var activity by rememberSaveable {
+        mutableStateOf(ActivityLevel.fromFactor(editing?.activityFactor))
+    }
+    var age by rememberSaveable { mutableStateOf(editing?.ageYears?.toString() ?: "") }
+    var weight by rememberSaveable { mutableStateOf(editing?.weightKg.toField()) }
+    var height by rememberSaveable { mutableStateOf(editing?.heightCm.toField()) }
+    var waist by rememberSaveable { mutableStateOf(editing?.waistCm.toField()) }
+    var arm by rememberSaveable { mutableStateOf(editing?.armCm.toField()) }
+    var chest by rememberSaveable { mutableStateOf(editing?.chestCm.toField()) }
+    var hip by rememberSaveable { mutableStateOf(editing?.hipCm.toField()) }
+    var thigh by rememberSaveable { mutableStateOf(editing?.thighCm.toField()) }
+    var neck by rememberSaveable { mutableStateOf(editing?.neckCm.toField()) }
     var openGuide by rememberSaveable { mutableStateOf<MeasurementGuide?>(null) }
 
     openGuide?.let { guide ->
@@ -103,8 +127,14 @@ fun AddMeasurementScreen(
     val livePreviewTdee = Bmr.tdee(livePreviewBmr, activity?.factor)
 
     val savedLabel = stringResource(R.string.saved)
+    val updatedLabel = stringResource(R.string.updated)
     val errInvalid = stringResource(R.string.error_invalid_number)
     val errRequired = stringResource(R.string.error_required_weight_height)
+
+    fun clearFields() {
+        age = ""; weight = ""; height = ""; waist = ""; arm = ""
+        chest = ""; hip = ""; thigh = ""; neck = ""
+    }
 
     Column(
         modifier = Modifier
@@ -113,6 +143,10 @@ fun AddMeasurementScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        if (isEditing) {
+            EditingBanner(onCancel = onCancelEdit)
+        }
+
         PreviewCard(
             bmi = livePreviewBmi,
             sex = sex,
@@ -158,12 +192,11 @@ fun AddMeasurementScreen(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             OutlinedButton(
-                onClick = {
-                    age = ""; weight = ""; height = ""; waist = ""; arm = ""
-                    chest = ""; hip = ""; thigh = ""; neck = ""
-                },
+                onClick = { if (isEditing) onCancelEdit() else clearFields() },
                 modifier = Modifier.weight(1f)
-            ) { Text(stringResource(R.string.clear)) }
+            ) {
+                Text(stringResource(if (isEditing) R.string.cancel else R.string.clear))
+            }
 
             Button(
                 onClick = {
@@ -173,23 +206,29 @@ fun AddMeasurementScreen(
                         showMessage(if (weight.isBlank() || height.isBlank()) errRequired else errInvalid)
                         return@Button
                     }
-                    onSave(
-                        sex,
-                        age.toIntOrNull(),
-                        activity,
-                        w, h,
-                        waist.toDoubleOrNull(),
-                        arm.toDoubleOrNull(),
-                        chest.toDoubleOrNull(),
-                        hip.toDoubleOrNull(),
-                        thigh.toDoubleOrNull(),
-                        neck.toDoubleOrNull()
-                    ) { result ->
+                    val input = MeasurementInput(
+                        sex = sex,
+                        ageYears = age.toIntOrNull(),
+                        activity = activity,
+                        weightKg = w,
+                        heightCm = h,
+                        waistCm = waist.toDoubleOrNull(),
+                        armCm = arm.toDoubleOrNull(),
+                        chestCm = chest.toDoubleOrNull(),
+                        hipCm = hip.toDoubleOrNull(),
+                        thighCm = thigh.toDoubleOrNull(),
+                        neckCm = neck.toDoubleOrNull()
+                    )
+                    onSave(input, editing?.id) { result ->
                         when (result) {
                             is SaveResult.Success -> {
-                                showMessage(savedLabel)
-                                weight = ""; height = ""; waist = ""; arm = ""
-                                chest = ""; hip = ""; thigh = ""; neck = ""
+                                if (isEditing) {
+                                    showMessage(updatedLabel)
+                                    onEditDone()
+                                } else {
+                                    showMessage(savedLabel)
+                                    clearFields()
+                                }
                             }
                             is SaveResult.Error -> showMessage(result.message)
                             SaveResult.Idle -> Unit
@@ -197,10 +236,44 @@ fun AddMeasurementScreen(
                     }
                 },
                 modifier = Modifier.weight(1f)
-            ) { Text(stringResource(R.string.save)) }
+            ) {
+                Text(stringResource(if (isEditing) R.string.update else R.string.save))
+            }
         }
 
         Spacer(Modifier.height(24.dp))
+    }
+}
+
+/** Formats a stored value back into an editable field string (drops trailing ".0"). */
+private fun Double?.toField(): String = when {
+    this == null -> ""
+    this % 1.0 == 0.0 -> toLong().toString()
+    else -> toString()
+}
+
+@Composable
+private fun EditingBanner(onCancel: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+        )
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.editing_entry),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                modifier = Modifier.weight(1f)
+            )
+            OutlinedButton(onClick = onCancel) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
     }
 }
 
