@@ -43,15 +43,16 @@ fun BodyMeasureApp() {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             val vm: MeasurementViewModel = viewModel()
             var tab by rememberSaveable { mutableStateOf(Tab.Add) }
-            var editingId by rememberSaveable { mutableStateOf<Long?>(null) }
             val stateHolder = rememberSaveableStateHolder()
             val snackbarHostState = remember { SnackbarHostState() }
             val scope = rememberCoroutineScope()
             val history by vm.history.collectAsState()
 
-            // Resolve the entry being edited from the live list so an external
-            // delete drops us back into "new entry" mode instead of stale state.
-            val editing = editingId?.let { id -> history.firstOrNull { it.id == id } }
+            // Edit target lives in the ViewModel; resolve against the live list so an
+            // external delete drops us back into "new entry" mode instead of stale state.
+            val editingId = vm.editingId
+            val isEditing = editingId != null && history.any { it.id == editingId }
+            val draft = if (isEditing) vm.editDraft else vm.newDraft
 
             Scaffold(
                 topBar = {
@@ -97,24 +98,26 @@ fun BodyMeasureApp() {
                     stateHolder.SaveableStateProvider(tab.name) {
                         when (tab) {
                             Tab.Add -> AddMeasurementScreen(
+                                draft = draft,
                                 onSave = vm::save,
                                 showMessage = showMessage,
-                                editing = editing,
-                                onCancelEdit = { editingId = null },
+                                isEditing = isEditing,
+                                editingId = editingId,
+                                onCancelEdit = { vm.stopEdit() },
                                 onEditDone = {
-                                    editingId = null
+                                    vm.stopEdit()
                                     tab = Tab.History
                                 }
                             )
                             Tab.History -> HistoryScreen(
                                 items = history,
                                 onDelete = { id ->
-                                    if (editingId == id) editingId = null
+                                    if (editingId == id) vm.stopEdit()
                                     vm.delete(id)
                                     showMessage(deletedLabel)
                                 },
                                 onEdit = { measurement ->
-                                    editingId = measurement.id
+                                    vm.startEdit(measurement)
                                     tab = Tab.Add
                                 }
                             )

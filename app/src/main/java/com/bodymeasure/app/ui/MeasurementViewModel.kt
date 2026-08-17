@@ -1,6 +1,9 @@
 package com.bodymeasure.app.ui
 
 import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.bodymeasure.app.data.Measurement
@@ -47,6 +50,25 @@ class MeasurementViewModel(app: Application) : AndroidViewModel(app) {
 
     val latest: StateFlow<Measurement?> = repo.observeLatest()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    /** In-progress new entry. Kept here so it survives leaving the Record tab. */
+    val newDraft = MeasurementDraft()
+
+    /** Separate draft for editing, so starting an edit doesn't discard a new entry. */
+    val editDraft = MeasurementDraft()
+
+    /** Id of the entry currently being edited, or null when creating a new one. */
+    var editingId by mutableStateOf<Long?>(null)
+        private set
+
+    fun startEdit(measurement: Measurement) {
+        editDraft.loadFrom(measurement)
+        editingId = measurement.id
+    }
+
+    fun stopEdit() {
+        editingId = null
+    }
 
     /**
      * Persist [input]. When [editingId] is null a new row is inserted; otherwise

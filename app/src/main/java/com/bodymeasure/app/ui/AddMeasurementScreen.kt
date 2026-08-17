@@ -33,7 +33,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -45,7 +44,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.bodymeasure.app.R
-import com.bodymeasure.app.data.Measurement
 import com.bodymeasure.app.util.ActivityLevel
 import com.bodymeasure.app.util.Bmi
 import com.bodymeasure.app.util.BmiCategory
@@ -55,68 +53,33 @@ import com.bodymeasure.app.util.BodyFatCategory
 import com.bodymeasure.app.util.Sex
 
 /**
- * Record form. When [editing] is non-null the form is prefilled with that
- * entry's values and saving updates it in place instead of inserting a new row.
+ * Record form. State lives in [draft] (owned by the ViewModel) so a partially
+ * filled form survives switching tabs. When [isEditing] is true, saving updates
+ * the existing entry rather than inserting a new one.
  */
 @Composable
 fun AddMeasurementScreen(
+    draft: MeasurementDraft,
     onSave: (input: MeasurementInput, editingId: Long?, onResult: (SaveResult) -> Unit) -> Unit,
     showMessage: (String) -> Unit,
-    editing: Measurement? = null,
+    isEditing: Boolean = false,
+    editingId: Long? = null,
     onCancelEdit: () -> Unit = {},
     onEditDone: () -> Unit = {}
 ) {
-    // Re-key on the entry being edited so the fields reset when the target changes.
-    key(editing?.id) {
-        MeasurementForm(
-            onSave = onSave,
-            showMessage = showMessage,
-            editing = editing,
-            onCancelEdit = onCancelEdit,
-            onEditDone = onEditDone
-        )
-    }
-}
-
-@Composable
-private fun MeasurementForm(
-    onSave: (input: MeasurementInput, editingId: Long?, onResult: (SaveResult) -> Unit) -> Unit,
-    showMessage: (String) -> Unit,
-    editing: Measurement?,
-    onCancelEdit: () -> Unit,
-    onEditDone: () -> Unit
-) {
-    val isEditing = editing != null
-
-    var sex by rememberSaveable {
-        mutableStateOf(
-            editing?.sex?.let { runCatching { Sex.valueOf(it) }.getOrNull() } ?: Sex.Male
-        )
-    }
-    var activity by rememberSaveable {
-        mutableStateOf(ActivityLevel.fromFactor(editing?.activityFactor))
-    }
-    var age by rememberSaveable { mutableStateOf(editing?.ageYears?.toString() ?: "") }
-    var weight by rememberSaveable { mutableStateOf(editing?.weightKg.toField()) }
-    var height by rememberSaveable { mutableStateOf(editing?.heightCm.toField()) }
-    var waist by rememberSaveable { mutableStateOf(editing?.waistCm.toField()) }
-    var arm by rememberSaveable { mutableStateOf(editing?.armCm.toField()) }
-    var chest by rememberSaveable { mutableStateOf(editing?.chestCm.toField()) }
-    var hip by rememberSaveable { mutableStateOf(editing?.hipCm.toField()) }
-    var thigh by rememberSaveable { mutableStateOf(editing?.thighCm.toField()) }
-    var neck by rememberSaveable { mutableStateOf(editing?.neckCm.toField()) }
     var openGuide by rememberSaveable { mutableStateOf<MeasurementGuide?>(null) }
 
     openGuide?.let { guide ->
         MeasurementGuideDialog(guide = guide, onDismiss = { openGuide = null })
     }
 
-    val ageI = age.toIntOrNull()
-    val weightD = weight.toDoubleOrNull()
-    val heightD = height.toDoubleOrNull()
-    val waistD = waist.toDoubleOrNull()
-    val hipD = hip.toDoubleOrNull()
-    val neckD = neck.toDoubleOrNull()
+    val sex = draft.sex
+    val ageI = draft.age.toIntOrNull()
+    val weightD = draft.weight.toDoubleOrNull()
+    val heightD = draft.height.toDoubleOrNull()
+    val waistD = draft.waist.toDoubleOrNull()
+    val hipD = draft.hip.toDoubleOrNull()
+    val neckD = draft.neck.toDoubleOrNull()
 
     val livePreviewBmi = if (weightD != null && heightD != null && weightD > 0 && heightD > 0)
         Bmi.calculate(weightD, heightD) else null
@@ -124,17 +87,12 @@ private fun MeasurementForm(
         BodyFat.calculate(sex, heightD, neckD, waistD, hipD) else null
     val livePreviewBmr = if (weightD != null && heightD != null)
         Bmr.calculate(sex, weightD, heightD, ageI) else null
-    val livePreviewTdee = Bmr.tdee(livePreviewBmr, activity?.factor)
+    val livePreviewTdee = Bmr.tdee(livePreviewBmr, draft.activity?.factor)
 
     val savedLabel = stringResource(R.string.saved)
     val updatedLabel = stringResource(R.string.updated)
     val errInvalid = stringResource(R.string.error_invalid_number)
     val errRequired = stringResource(R.string.error_required_weight_height)
-
-    fun clearFields() {
-        age = ""; weight = ""; height = ""; waist = ""; arm = ""
-        chest = ""; hip = ""; thigh = ""; neck = ""
-    }
 
     Column(
         modifier = Modifier
@@ -155,23 +113,32 @@ private fun MeasurementForm(
             tdeeKcal = livePreviewTdee
         )
 
-        SexSelector(sex = sex, onChange = { sex = it })
-        ActivitySelector(activity = activity, onChange = { activity = it })
+        SexSelector(sex = draft.sex, onChange = { draft.sex = it })
+        ActivitySelector(activity = draft.activity, onChange = { draft.activity = it })
 
-        IntegerField(value = age, onChange = { age = it }, label = stringResource(R.string.age_years))
-        NumberField(value = weight, onChange = { weight = it }, label = stringResource(R.string.weight_kg))
-        NumberField(value = height, onChange = { height = it }, label = stringResource(R.string.height_cm))
-        NumberField(value = neck, onChange = { neck = it }, label = stringResource(R.string.neck_cm),
+        IntegerField(value = draft.age, onChange = { draft.age = it },
+            label = stringResource(R.string.age_years))
+        NumberField(value = draft.weight, onChange = { draft.weight = it },
+            label = stringResource(R.string.weight_kg))
+        NumberField(value = draft.height, onChange = { draft.height = it },
+            label = stringResource(R.string.height_cm))
+        NumberField(value = draft.neck, onChange = { draft.neck = it },
+            label = stringResource(R.string.neck_cm),
             onInfoClick = { openGuide = MeasurementGuide.Neck })
-        NumberField(value = waist, onChange = { waist = it }, label = stringResource(R.string.waist_cm),
+        NumberField(value = draft.waist, onChange = { draft.waist = it },
+            label = stringResource(R.string.waist_cm),
             onInfoClick = { openGuide = MeasurementGuide.Waist })
-        NumberField(value = hip, onChange = { hip = it }, label = stringResource(R.string.hip_cm),
+        NumberField(value = draft.hip, onChange = { draft.hip = it },
+            label = stringResource(R.string.hip_cm),
             onInfoClick = { openGuide = MeasurementGuide.Hip })
-        NumberField(value = chest, onChange = { chest = it }, label = stringResource(R.string.chest_cm),
+        NumberField(value = draft.chest, onChange = { draft.chest = it },
+            label = stringResource(R.string.chest_cm),
             onInfoClick = { openGuide = MeasurementGuide.Chest })
-        NumberField(value = arm, onChange = { arm = it }, label = stringResource(R.string.arm_cm),
+        NumberField(value = draft.arm, onChange = { draft.arm = it },
+            label = stringResource(R.string.arm_cm),
             onInfoClick = { openGuide = MeasurementGuide.Arm })
-        NumberField(value = thigh, onChange = { thigh = it }, label = stringResource(R.string.thigh_cm),
+        NumberField(value = draft.thigh, onChange = { draft.thigh = it },
+            label = stringResource(R.string.thigh_cm),
             onInfoClick = { openGuide = MeasurementGuide.Thigh })
 
         Text(
@@ -192,7 +159,7 @@ private fun MeasurementForm(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             OutlinedButton(
-                onClick = { if (isEditing) onCancelEdit() else clearFields() },
+                onClick = { if (isEditing) onCancelEdit() else draft.clearMeasurements() },
                 modifier = Modifier.weight(1f)
             ) {
                 Text(stringResource(if (isEditing) R.string.cancel else R.string.clear))
@@ -200,26 +167,15 @@ private fun MeasurementForm(
 
             Button(
                 onClick = {
-                    val w = weight.toDoubleOrNull()
-                    val h = height.toDoubleOrNull()
-                    if (w == null || h == null) {
-                        showMessage(if (weight.isBlank() || height.isBlank()) errRequired else errInvalid)
+                    val input = draft.toInputOrNull()
+                    if (input == null) {
+                        showMessage(
+                            if (draft.weight.isBlank() || draft.height.isBlank()) errRequired
+                            else errInvalid
+                        )
                         return@Button
                     }
-                    val input = MeasurementInput(
-                        sex = sex,
-                        ageYears = age.toIntOrNull(),
-                        activity = activity,
-                        weightKg = w,
-                        heightCm = h,
-                        waistCm = waist.toDoubleOrNull(),
-                        armCm = arm.toDoubleOrNull(),
-                        chestCm = chest.toDoubleOrNull(),
-                        hipCm = hip.toDoubleOrNull(),
-                        thighCm = thigh.toDoubleOrNull(),
-                        neckCm = neck.toDoubleOrNull()
-                    )
-                    onSave(input, editing?.id) { result ->
+                    onSave(input, editingId) { result ->
                         when (result) {
                             is SaveResult.Success -> {
                                 if (isEditing) {
@@ -227,7 +183,7 @@ private fun MeasurementForm(
                                     onEditDone()
                                 } else {
                                     showMessage(savedLabel)
-                                    clearFields()
+                                    draft.clearMeasurements()
                                 }
                             }
                             is SaveResult.Error -> showMessage(result.message)
@@ -243,13 +199,6 @@ private fun MeasurementForm(
 
         Spacer(Modifier.height(24.dp))
     }
-}
-
-/** Formats a stored value back into an editable field string (drops trailing ".0"). */
-private fun Double?.toField(): String = when {
-    this == null -> ""
-    this % 1.0 == 0.0 -> toLong().toString()
-    else -> toString()
 }
 
 @Composable
