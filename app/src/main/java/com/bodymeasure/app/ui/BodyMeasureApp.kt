@@ -25,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -43,6 +44,7 @@ fun BodyMeasureApp() {
             val vm: MeasurementViewModel = viewModel()
             var tab by rememberSaveable { mutableStateOf(Tab.Add) }
             var editingId by rememberSaveable { mutableStateOf<Long?>(null) }
+            val stateHolder = rememberSaveableStateHolder()
             val snackbarHostState = remember { SnackbarHostState() }
             val scope = rememberCoroutineScope()
             val history by vm.history.collectAsState()
@@ -90,30 +92,34 @@ fun BodyMeasureApp() {
                 }
                 val deletedLabel = stringResource(R.string.deleted)
                 Box(Modifier.padding(padding)) {
-                    when (tab) {
-                        Tab.Add -> AddMeasurementScreen(
-                            onSave = vm::save,
-                            showMessage = showMessage,
-                            editing = editing,
-                            onCancelEdit = { editingId = null },
-                            onEditDone = {
-                                editingId = null
-                                tab = Tab.History
-                            }
-                        )
-                        Tab.History -> HistoryScreen(
-                            items = history,
-                            onDelete = { id ->
-                                if (editingId == id) editingId = null
-                                vm.delete(id)
-                                showMessage(deletedLabel)
-                            },
-                            onEdit = { measurement ->
-                                editingId = measurement.id
-                                tab = Tab.Add
-                            }
-                        )
-                        Tab.Trends -> TrendsScreen(items = history)
+                    // Each tab's state is saved when it leaves the composition, so a
+                    // half-filled Record form survives switching to History and back.
+                    stateHolder.SaveableStateProvider(tab.name) {
+                        when (tab) {
+                            Tab.Add -> AddMeasurementScreen(
+                                onSave = vm::save,
+                                showMessage = showMessage,
+                                editing = editing,
+                                onCancelEdit = { editingId = null },
+                                onEditDone = {
+                                    editingId = null
+                                    tab = Tab.History
+                                }
+                            )
+                            Tab.History -> HistoryScreen(
+                                items = history,
+                                onDelete = { id ->
+                                    if (editingId == id) editingId = null
+                                    vm.delete(id)
+                                    showMessage(deletedLabel)
+                                },
+                                onEdit = { measurement ->
+                                    editingId = measurement.id
+                                    tab = Tab.Add
+                                }
+                            )
+                            Tab.Trends -> TrendsScreen(items = history)
+                        }
                     }
                 }
             }
