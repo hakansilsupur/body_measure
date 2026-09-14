@@ -65,6 +65,15 @@
     <string name="saved">Saved</string>
     <string name="deleted">Entry deleted</string>
 
+    <string name="more_options">More options</string>
+    <string name="export_data">Export data</string>
+    <string name="import_data">Import data</string>
+    <string name="export_empty">Nothing to export yet</string>
+    <string name="export_done">Exported %1$d entries</string>
+    <string name="import_done">Imported %1$d entries</string>
+    <string name="import_done_with_skips">Imported %1$d entries (%2$d already present)</string>
+    <string name="import_none_new">Nothing new to import — all entries already present</string>
+
     <string name="how_to_measure">How to measure</string>
     <string name="got_it">Got it</string>
     <string name="guide_no_image">No image set. Add a URL in MeasurementGuide.kt to show a photo here.</string>

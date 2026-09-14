@@ -19,6 +19,17 @@ interface MeasurementDao {
     @Query("SELECT * FROM measurements WHERE id = :id")
     suspend fun getById(id: Long): Measurement?
 
+    /** One-shot read of everything, for export. */
+    @Query("SELECT * FROM measurements ORDER BY timestamp DESC")
+    suspend fun getAllOnce(): List<Measurement>
+
+    /** Used to skip entries already present when importing. */
+    @Query("SELECT timestamp FROM measurements")
+    suspend fun allTimestamps(): List<Long>
+
+    @Insert
+    suspend fun insertAll(measurements: List<Measurement>)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(measurement: Measurement): Long
 

@@ -99,11 +99,58 @@ a Play Store release.
 Caveats worth knowing:
 
 - **Uninstalling still erases everything.** That is Android's behaviour for app
-  data, not something the app controls.
+  data, not something the app controls — use Export (below) first.
 - Android Auto Backup is enabled for the database (`res/xml/backup_rules.xml`),
   so a reinstall on a device with backup turned on may restore it.
 - Sideloading an *older* build than the one installed triggers a downgrade,
   which cannot be migrated and will rebuild the database empty.
+
+## Export and import
+
+The ⋮ menu in the top bar has **Export data** and **Import data**. This is the
+manual backup that covers the cases the database itself cannot: moving to a new
+phone, recovering after an uninstall, or just keeping a copy somewhere safe.
+
+**Export** writes every entry to a JSON file wherever you choose — internal
+storage, Drive, anywhere the system file picker can reach. The suggested name is
+`body-measure-backup-YYYY-MM-DD.json`.
+
+**Import** reads such a file back and adds any entries not already present.
+Entries are matched by timestamp, so importing the same file twice adds nothing
+the second time — there is no way to end up with duplicated history by mistake.
+Import only ever *adds*; it never deletes or overwrites what is already there.
+
+The format is plain JSON and easy to inspect or edit by hand:
+
+```json
+{
+  "formatVersion": 1,
+  "exportedAt": 1757808000000,
+  "entries": [
+    {
+      "timestamp": 1757808000000,
+      "sex": "Male",
+      "ageYears": 34,
+      "weightKg": 78.5,
+      "heightCm": 180.0,
+      "waistCm": 84.0,
+      "neckCm": 38.0,
+      "bmi": 24.2,
+      "bodyFatPct": 17.4,
+      "bmrKcal": 1742.0,
+      "activityFactor": 1.55
+    }
+  ]
+}
+```
+
+Entries missing `weightKg` or `heightCm` are skipped on import, since neither
+BMI nor anything derived from it can be computed without them. `formatVersion`
+lets a future build recognise and upgrade older backup files; a file claiming a
+*newer* version than the app understands is rejected rather than half-read.
+
+No storage permission is required — both actions go through the system file
+picker, so the app only ever touches the single file you point it at.
 
 ## BMI reference
 
