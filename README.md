@@ -14,7 +14,8 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
 - TDEE = BMR × activity factor (5 activity levels) when an activity level is
   picked.
 - Live BMI / body-fat / BMR / TDEE preview card as you type.
-- **Trends tab** with three line charts (BMI, body fat %, BMR) drawn over time.
+- **Trends tab** charting every recorded value over time — BMI, weight, body
+  fat, BMR, and each circumference (waist, chest, arm, thigh, hip, neck).
 - **Analysis tab**: lean/fat mass, FFMI, waist-to-height, waist-to-hip and
   healthy weight range, all derived from what you already entered.
 - **How-to-measure illustrations**: tap the info icon next to any measurement
@@ -173,6 +174,9 @@ recorded before this feature existed get analysed too.
 | Waist-to-height | waist, height | Central-fat risk; better predictor than BMI |
 | Waist-to-hip | waist, hip | Where fat sits, against WHO thresholds |
 | Healthy weight range | height | Weight span for BMI 18.5–24.9 |
+| Thigh circumference | thigh | Leg muscle as a cardiovascular marker |
+| Proportions | waist + chest/arm/thigh | Chest-to-waist, arm-to-waist, thigh-to-waist, chest-to-hip |
+| Change over time | 2+ entries | Every measurement vs. your previous and first entry |
 
 Each card names what is missing when it cannot be computed, rather than showing
 a blank, so it is clear which measurement unlocks it.
@@ -188,6 +192,13 @@ labels them that way rather than calling either one "muscle mass".
 FFMI is height-normalised to 1.8 m (Kouri et al. 1995) so it compares fairly
 across body sizes. Roughly 25 for men and 19 for women sits near the documented
 drug-free ceiling.
+
+Chest, arm and thigh feed the **Proportions** card and the **Change over time**
+table, and each gets its own chart in Trends. The proportion ratios carry no
+medical thresholds — the "ideal" figures circulated in fitness writing are
+aesthetic conventions, so the app reports the numbers and leaves them
+uncoloured. The exception is absolute thigh circumference, which has an actual
+cohort study behind it and is labelled with its source and its limits.
 
 ## Progress photos
 

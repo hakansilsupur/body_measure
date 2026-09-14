@@ -99,6 +99,30 @@
     <string name="risk_moderate">Moderate risk</string>
     <string name="risk_high">High risk</string>
 
+    <string name="analysis_proportions">Proportions</string>
+    <string name="analysis_proportions_help">Ratios between your circumferences. Unlike the risk metrics above, there is no medical threshold for these — the commonly quoted "ideal" figures are aesthetic conventions, not health targets. They are most useful watched over time: a rising chest-to-waist means the waist held while the chest grew.</string>
+    <string name="analysis_chest_waist">Chest / waist</string>
+    <string name="analysis_arm_waist">Arm / waist</string>
+    <string name="analysis_thigh_waist">Thigh / waist</string>
+    <string name="analysis_chest_hip">Chest / hip</string>
+
+    <string name="analysis_thigh_size">Thigh circumference</string>
+    <string name="analysis_thigh_help">A large Danish cohort study linked thigh circumference under about 60 cm to higher cardiovascular risk, independent of body fat — muscle in the legs appears protective. It is one study on one population, so read it as context, not a verdict.</string>
+
+    <string name="analysis_progress">Change over time</string>
+    <string name="analysis_progress_help">Each measurement against your previous entry and your first one. Whether a number should go up or down depends on your goal, so no direction is marked good or bad here.</string>
+    <string name="analysis_vs_previous">vs previous</string>
+    <string name="analysis_vs_first">vs first</string>
+    <string name="analysis_progress_needs">Record at least two entries to see changes.</string>
+
+    <string name="trends_weight">Weight (kg) over time</string>
+    <string name="trends_waist">Waist (cm) over time</string>
+    <string name="trends_chest">Chest (cm) over time</string>
+    <string name="trends_arm">Arm (cm) over time</string>
+    <string name="trends_thigh">Thigh (cm) over time</string>
+    <string name="trends_hip">Hip (cm) over time</string>
+    <string name="trends_neck">Neck (cm) over time</string>
+
     <string name="analysis_needs">Add %1$s to unlock this</string>
     <string name="analysis_empty">Record a measurement first and your analysis will appear here.</string>
 

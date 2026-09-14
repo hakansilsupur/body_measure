@@ -32,6 +32,7 @@ import com.bodymeasure.app.util.Sex
 import java.text.DateFormat
 import java.util.Date
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 private val Good = Color(0xFF43A047)
 private val Warn = Color(0xFFFB8C00)
@@ -188,6 +189,45 @@ fun AnalysisScreen(items: List<Measurement>) {
             }
         }
 
+        // ---- Thigh circumference ----
+        val thighRisk = BodyAnalysis.thighRisk(latest.thighCm)
+        AnalysisCard(
+            title = stringResource(R.string.analysis_thigh_size),
+            help = stringResource(R.string.analysis_thigh_help),
+            missing = if (thighRisk == null) "thigh" else null
+        ) {
+            if (latest.thighCm != null && thighRisk != null) {
+                BigValue(
+                    value = "${BodyAnalysis.format1(latest.thighCm)} cm",
+                    caption = riskLabel(thighRisk),
+                    color = riskColor(thighRisk)
+                )
+            }
+        }
+
+        // ---- Proportions (uses chest, arm, thigh) ----
+        val chestWaist = BodyAnalysis.ratio(latest.chestCm, latest.waistCm)
+        val armWaist = BodyAnalysis.ratio(latest.armCm, latest.waistCm)
+        val thighWaist = BodyAnalysis.ratio(latest.thighCm, latest.waistCm)
+        val chestHip = BodyAnalysis.ratio(latest.chestCm, latest.hipCm)
+        val anyProportion = listOfNotNull(chestWaist, armWaist, thighWaist, chestHip).isNotEmpty()
+
+        AnalysisCard(
+            title = stringResource(R.string.analysis_proportions),
+            help = stringResource(R.string.analysis_proportions_help),
+            missing = if (!anyProportion) "waist plus chest, arm or thigh" else null
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                RatioRow(stringResource(R.string.analysis_chest_waist), chestWaist)
+                RatioRow(stringResource(R.string.analysis_arm_waist), armWaist)
+                RatioRow(stringResource(R.string.analysis_thigh_waist), thighWaist)
+                RatioRow(stringResource(R.string.analysis_chest_hip), chestHip)
+            }
+        }
+
+        // ---- Change over time ----
+        ProgressCard(items = items)
+
         Text(
             text = stringResource(R.string.analysis_disclaimer),
             style = MaterialTheme.typography.bodySmall,
@@ -195,6 +235,126 @@ fun AnalysisScreen(items: List<Measurement>) {
             modifier = Modifier.padding(vertical = 8.dp)
         )
     }
+}
+
+@Composable
+private fun RatioRow(label: String, value: Double?) {
+    if (value == null) return
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(label, style = MaterialTheme.typography.bodyMedium)
+        Text(
+            BodyAnalysis.format2(value),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
+}
+
+/** Per-measurement deltas against the previous entry and the very first one. */
+@Composable
+private fun ProgressCard(items: List<Measurement>) {
+    val ordered = remember(items) { items.sortedBy { it.timestamp } }
+    if (ordered.size < 2) {
+        AnalysisCard(
+            title = stringResource(R.string.analysis_progress),
+            help = stringResource(R.string.analysis_progress_help),
+            missing = null
+        ) {
+            Text(
+                stringResource(R.string.analysis_progress_needs),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.outline
+            )
+        }
+        return
+    }
+
+    val current = ordered.last()
+    val previous = ordered[ordered.size - 2]
+    val first = ordered.first()
+
+    val rows = listOf(
+        Triple("Weight", "kg", Triple(current.weightKg, previous.weightKg, first.weightKg)),
+        Triple("Waist", "cm", Triple(current.waistCm, previous.waistCm, first.waistCm)),
+        Triple("Chest", "cm", Triple(current.chestCm, previous.chestCm, first.chestCm)),
+        Triple("Arm", "cm", Triple(current.armCm, previous.armCm, first.armCm)),
+        Triple("Thigh", "cm", Triple(current.thighCm, previous.thighCm, first.thighCm)),
+        Triple("Hip", "cm", Triple(current.hipCm, previous.hipCm, first.hipCm)),
+        Triple("Neck", "cm", Triple(current.neckCm, previous.neckCm, first.neckCm)),
+        Triple("Body fat", "%", Triple(current.bodyFatPct, previous.bodyFatPct, first.bodyFatPct))
+    ).filter { it.third.first != null }
+
+    AnalysisCard(
+        title = stringResource(R.string.analysis_progress),
+        help = stringResource(R.string.analysis_progress_help),
+        missing = if (rows.isEmpty()) "any measurement" else null
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Box(Modifier.weight(1.4f))
+                Label(stringResource(R.string.analysis_vs_previous), Modifier.weight(1f))
+                Label(stringResource(R.string.analysis_vs_first), Modifier.weight(1f))
+            }
+            rows.forEach { (name, unit, values) ->
+                val (cur, prev, firstVal) = values
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(Modifier.weight(1.4f)) {
+                        Text(name, style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            "${BodyAnalysis.format1(cur!!)} $unit",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    DeltaText(cur, prev, unit, Modifier.weight(1f))
+                    DeltaText(cur, firstVal, unit, Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Label(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text,
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = modifier
+    )
+}
+
+/**
+ * Shows the signed change. Deliberately not colour-coded by direction: whether a
+ * measurement should rise or fall depends entirely on the user's goal.
+ */
+@Composable
+private fun DeltaText(current: Double?, baseline: Double?, unit: String, modifier: Modifier = Modifier) {
+    val text = when {
+        current == null || baseline == null -> "—"
+        else -> {
+            val d = current - baseline
+            val rounded = (d * 10).roundToInt() / 10.0
+            when {
+                rounded > 0 -> "+${BodyAnalysis.format1(rounded)} $unit"
+                rounded < 0 -> "${BodyAnalysis.format1(rounded)} $unit"
+                else -> "±0 $unit"
+            }
+        }
+    }
+    Text(
+        text,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = modifier
+    )
 }
 
 @Composable

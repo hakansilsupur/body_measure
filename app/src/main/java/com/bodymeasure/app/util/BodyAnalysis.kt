@@ -116,6 +116,26 @@ object BodyAnalysis {
         }
     }
 
+    /** Generic circumference ratio, null unless both values are present and positive. */
+    fun ratio(numerator: Double?, denominator: Double?): Double? {
+        if (numerator == null || denominator == null) return null
+        if (numerator <= 0 || denominator <= 0) return null
+        val r = numerator / denominator
+        return if (r.isFinite()) r else null
+    }
+
+    /**
+     * Copenhagen City Heart Study (Heitmann & Frederiksen, BMJ 2009) found thigh
+     * circumference below roughly 60 cm associated with higher cardiovascular
+     * risk, independent of fat mass. Below 50 cm the association was strongest.
+     */
+    fun thighRisk(thighCm: Double?): RiskLevel? = when {
+        thighCm == null || thighCm <= 0 -> null
+        thighCm >= 60.0 -> RiskLevel.Low
+        thighCm >= 50.0 -> RiskLevel.Moderate
+        else -> RiskLevel.High
+    }
+
     fun format1(v: Double): String = "%.1f".format((v * 10).roundToInt() / 10.0)
 
     fun format2(v: Double): String = "%.2f".format(v)
