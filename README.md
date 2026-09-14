@@ -71,7 +71,39 @@ on every push and uploads it as an artifact.
 4. On the phone, allow "Install unknown apps" for the app you used to open
    the APK (file manager / browser), then tap the APK to install.
 
-The APK is unsigned debug — fine for personal use, not for the Play Store.
+The APK is a debug build — fine for personal use, not for the Play Store.
+
+## Data persistence across app updates
+
+Your recorded history lives in a local Room database (`body_measure.db`) and is
+designed to survive installing a newer build over an older one. Two things make
+that work, and both are easy to break:
+
+**1. Real schema migrations.** Every database version bump ships a migration in
+`app/src/main/java/com/bodymeasure/app/data/Migrations.kt`. The database is
+explicitly *not* configured with `fallbackToDestructiveMigration()`, because
+that silently deletes every saved entry whenever the schema changes. If you add
+a column to `Measurement`, you must bump the `version` in `MeasurementDatabase`
+and add a matching migration, or the app will throw on open for existing users.
+Room's exported schema JSON is written to `app/schemas/` to make that diffable.
+
+**2. A stable signing key.** `keystore/debug.keystore` is committed on purpose
+and wired up in `app/build.gradle.kts`. Android refuses to update an app in
+place if the new APK is signed with a different key — and the only way past
+that is to uninstall, which erases the database. Without a checked-in key,
+every CI runner generates a throwaway keystore and every build is
+un-installable over the last one. This is a debug key: it is not secret, the
+password is the Android default (`android`), and it must never be used to sign
+a Play Store release.
+
+Caveats worth knowing:
+
+- **Uninstalling still erases everything.** That is Android's behaviour for app
+  data, not something the app controls.
+- Android Auto Backup is enabled for the database (`res/xml/backup_rules.xml`),
+  so a reinstall on a device with backup turned on may restore it.
+- Sideloading an *older* build than the one installed triggers a downgrade,
+  which cannot be migrated and will rebuild the database empty.
 
 ## BMI reference
 

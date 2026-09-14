@@ -5,6 +5,11 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+// Room writes the schema JSON here so migrations can be diffed and verified.
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 android {
     namespace = "com.bodymeasure.app"
     compileSdk = 35
@@ -13,12 +18,30 @@ android {
         applicationId = "com.bodymeasure.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1.0"
         vectorDrawables.useSupportLibrary = true
     }
 
+    signingConfigs {
+        // A checked-in debug key so every build — local or CI — is signed
+        // identically. Without this, each CI runner generates a throwaway
+        // keystore, Android sees a different signature and refuses to update
+        // in place, and the only way to install is to uninstall first, which
+        // deletes the database. This is a DEBUG key only; it is not secret and
+        // must never be used to sign a Play Store release.
+        getByName("debug") {
+            storeFile = rootProject.file("keystore/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(

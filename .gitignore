@@ -19,3 +19,11 @@ captures/
 # OS
 .DS_Store
 Thumbs.db
+
+# Signing keys
+# The debug keystore IS committed on purpose (see app/build.gradle.kts) so that
+# every build shares a signature and app updates preserve the database.
+# Release/upload keystores must NEVER be committed:
+release.keystore
+*.jks
+keystore.properties

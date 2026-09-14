@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Measurement::class], version = 4, exportSchema = false)
+@Database(entities = [Measurement::class], version = 4, exportSchema = true)
 abstract class MeasurementDatabase : RoomDatabase() {
 
     abstract fun measurementDao(): MeasurementDao
@@ -20,8 +20,14 @@ abstract class MeasurementDatabase : RoomDatabase() {
                     MeasurementDatabase::class.java,
                     "body_measure.db"
                 )
-                    // Pre-release: schema additions wipe the DB on version bump.
-                    .fallbackToDestructiveMigration()
+                    // Recorded history must survive app updates, so every schema
+                    // change ships a real migration (see Migrations.kt). Do not add
+                    // fallbackToDestructiveMigration() here — it deletes user data.
+                    .addMigrations(*ALL_MIGRATIONS)
+                    // A downgrade only happens when sideloading an older build, where
+                    // there is no forward schema to migrate into. Rebuilding is the
+                    // only safe option in that case.
+                    .fallbackToDestructiveMigrationOnDowngrade()
                     .build()
                     .also { instance = it }
             }
