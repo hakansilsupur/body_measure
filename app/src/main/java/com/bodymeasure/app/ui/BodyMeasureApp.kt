@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material.icons.filled.Upload
@@ -46,7 +47,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private enum class Tab { Add, History, Trends }
+private enum class Tab { Add, History, Trends, Analysis }
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -147,6 +148,12 @@ fun BodyMeasureApp() {
                             icon = { Icon(Icons.Default.ShowChart, contentDescription = null) },
                             label = { Text(stringResource(R.string.tab_trends)) }
                         )
+                        NavigationBarItem(
+                            selected = tab == Tab.Analysis,
+                            onClick = { tab = Tab.Analysis },
+                            icon = { Icon(Icons.Default.Insights, contentDescription = null) },
+                            label = { Text(stringResource(R.string.tab_analysis)) }
+                        )
                     }
                 },
                 snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -191,6 +198,7 @@ fun BodyMeasureApp() {
                                 }
                             )
                             Tab.Trends -> TrendsScreen(items = history)
+                            Tab.Analysis -> AnalysisScreen(items = history)
                         }
                     }
                 }

@@ -65,6 +65,43 @@
     <string name="saved">Saved</string>
     <string name="deleted">Entry deleted</string>
 
+    <string name="tab_analysis">Analysis</string>
+    <string name="analysis_based_on">Based on your entry from %1$s</string>
+    <string name="analysis_disclaimer">These are estimates from tape measurements, not a clinical body-composition assessment. Trends over time are more meaningful than any single number.</string>
+
+    <string name="analysis_lean_mass">Lean mass</string>
+    <string name="analysis_lean_mass_help">Everything that isn\'t fat — muscle, bone, organs and water. A tape measure can\'t separate muscle from the rest, so this is the closest honest figure.</string>
+    <string name="analysis_fat_mass">Fat mass</string>
+    <string name="analysis_fat_mass_help">Your weight multiplied by body-fat percentage.</string>
+    <string name="analysis_composition">Body composition</string>
+
+    <string name="analysis_ffmi">FFMI</string>
+    <string name="analysis_ffmi_full">Fat-free mass index</string>
+    <string name="analysis_ffmi_help">Lean mass scaled to your height, so it compares fairly across body sizes. This is the usual stand-in for "how muscular am I". Around 25 (men) or 19 (women) is near the drug-free ceiling.</string>
+    <string name="ffmi_below_average">Below average</string>
+    <string name="ffmi_average">Average</string>
+    <string name="ffmi_above_average">Above average</string>
+    <string name="ffmi_athletic">Athletic</string>
+    <string name="ffmi_exceptional">Exceptional</string>
+
+    <string name="analysis_whtr">Waist-to-height</string>
+    <string name="analysis_whtr_help">Waist divided by height. Predicts metabolic risk better than BMI because it reflects fat around the organs. The rule of thumb: keep your waist under half your height.</string>
+    <string name="analysis_whr">Waist-to-hip</string>
+    <string name="analysis_whr_help">Waist divided by hips, using WHO thresholds. Reflects where fat is stored — around the middle carries more risk than around the hips.</string>
+
+    <string name="analysis_healthy_weight">Healthy weight range</string>
+    <string name="analysis_healthy_weight_help">The weight span matching BMI 18.5–24.9 at your height. BMI ignores build and muscle, so treat this as a rough guide.</string>
+    <string name="analysis_within_range">You\'re within this range</string>
+    <string name="analysis_above_range">%1$s kg above the range</string>
+    <string name="analysis_below_range">%1$s kg below the range</string>
+
+    <string name="risk_low">Low risk</string>
+    <string name="risk_moderate">Moderate risk</string>
+    <string name="risk_high">High risk</string>
+
+    <string name="analysis_needs">Add %1$s to unlock this</string>
+    <string name="analysis_empty">Record a measurement first and your analysis will appear here.</string>
+
     <string name="photo_section">Progress photo</string>
     <string name="photo_take">Take photo</string>
     <string name="photo_retake">Retake</string>

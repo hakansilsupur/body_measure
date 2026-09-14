@@ -15,6 +15,8 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
   picked.
 - Live BMI / body-fat / BMR / TDEE preview card as you type.
 - **Trends tab** with three line charts (BMI, body fat %, BMR) drawn over time.
+- **Analysis tab**: lean/fat mass, FFMI, waist-to-height, waist-to-hip and
+  healthy weight range, all derived from what you already entered.
 - **How-to-measure illustrations**: tap the info icon next to any measurement
   field to see a small diagram and instructions for proper tape placement.
 - History of all entries, sorted newest first, with per-entry delete.
@@ -157,6 +159,35 @@ picker, so the app only ever touches the single file you point it at.
 by megabytes per entry. The photo's file name is exported so the link survives a
 restore *on the same device*, but after an uninstall the images themselves are
 gone and those entries simply show no photo.
+
+## Analysis
+
+The **Analysis** tab derives further metrics from the most recent entry. Nothing
+extra is stored — these are pure functions of existing fields, so entries
+recorded before this feature existed get analysed too.
+
+| Metric | Needs | What it says |
+|---|---|---|
+| Lean / fat mass | body-fat inputs | Splits weight into fat and everything else |
+| FFMI | body-fat inputs | Lean mass scaled to height, comparable across body sizes |
+| Waist-to-height | waist, height | Central-fat risk; better predictor than BMI |
+| Waist-to-hip | waist, hip | Where fat sits, against WHO thresholds |
+| Healthy weight range | height | Weight span for BMI 18.5–24.9 |
+
+Each card names what is missing when it cannot be computed, rather than showing
+a blank, so it is clear which measurement unlocks it.
+
+### On "muscle ratio"
+
+There is no honest way to isolate **muscle** from a tape measure. Separating
+muscle from bone, organs and water needs skinfold calipers, DEXA or a BIA scale.
+What these inputs support is **lean mass** (everything that isn't fat) and
+**FFMI**, which is the metric normally used as a proxy for muscularity. The app
+labels them that way rather than calling either one "muscle mass".
+
+FFMI is height-normalised to 1.8 m (Kouri et al. 1995) so it compares fairly
+across body sizes. Roughly 25 for men and 19 for women sits near the documented
+drug-free ceiling.
 
 ## Progress photos
 
