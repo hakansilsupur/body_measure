@@ -13,6 +13,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  * v1 -> v2  added sex, bodyFatPct
  * v2 -> v3  added ageYears, bmrKcal
  * v3 -> v4  added activityFactor
+ * v4 -> v5  added photoFileName
  *
  * Note: `sex` is NOT NULL, so SQLite requires a DEFAULT on the ALTER. The
  * entity deliberately does not declare @ColumnInfo(defaultValue = ...), which
@@ -39,8 +40,15 @@ internal val MIGRATION_3_4 = object : Migration(3, 4) {
     }
 }
 
+internal val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE measurements ADD COLUMN photoFileName TEXT")
+    }
+}
+
 internal val ALL_MIGRATIONS = arrayOf(
     MIGRATION_1_2,
     MIGRATION_2_3,
-    MIGRATION_3_4
+    MIGRATION_3_4,
+    MIGRATION_4_5
 )

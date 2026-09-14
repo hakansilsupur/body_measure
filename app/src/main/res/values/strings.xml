@@ -65,6 +65,15 @@
     <string name="saved">Saved</string>
     <string name="deleted">Entry deleted</string>
 
+    <string name="photo_section">Progress photo</string>
+    <string name="photo_take">Take photo</string>
+    <string name="photo_retake">Retake</string>
+    <string name="photo_choose">Choose photo</string>
+    <string name="photo_remove">Remove photo</string>
+    <string name="photo_tap_to_enlarge">Tap the photo to view it full size</string>
+    <string name="photo_camera_failed">Couldn\'t open the camera</string>
+    <string name="photo_attach_failed">Couldn\'t attach that image</string>
+
     <string name="more_options">More options</string>
     <string name="export_data">Export data</string>
     <string name="import_data">Import data</string>

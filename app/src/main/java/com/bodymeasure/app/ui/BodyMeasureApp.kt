@@ -75,6 +75,7 @@ fun BodyMeasureApp() {
             val importDoneFmt = stringResource(R.string.import_done)
             val importSkipsFmt = stringResource(R.string.import_done_with_skips)
             val importNoneNew = stringResource(R.string.import_none_new)
+            val photoFailedMsg = stringResource(R.string.photo_attach_failed)
 
             val onTransferResult: (TransferResult) -> Unit = { result ->
                 showMessage(
@@ -163,6 +164,14 @@ fun BodyMeasureApp() {
                                 showMessage = showMessage,
                                 isEditing = isEditing,
                                 editingId = editingId,
+                                onPhotoPicked = { uri ->
+                                    vm.attachPhoto(draft, uri) { ok ->
+                                        if (!ok) showMessage(photoFailedMsg)
+                                    }
+                                },
+                                onPhotoCaptured = { name -> draft.photoFileName = name },
+                                onPhotoRemoved = { vm.clearPhoto(draft) },
+                                newCameraTarget = vm::newCameraTarget,
                                 onCancelEdit = { vm.stopEdit() },
                                 onEditDone = {
                                     vm.stopEdit()

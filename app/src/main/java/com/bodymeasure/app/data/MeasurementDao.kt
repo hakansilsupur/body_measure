@@ -27,6 +27,10 @@ interface MeasurementDao {
     @Query("SELECT timestamp FROM measurements")
     suspend fun allTimestamps(): List<Long>
 
+    /** Every referenced photo, for cleaning up files no entry points at. */
+    @Query("SELECT photoFileName FROM measurements WHERE photoFileName IS NOT NULL")
+    suspend fun allPhotoNames(): List<String>
+
     @Insert
     suspend fun insertAll(measurements: List<Measurement>)
 

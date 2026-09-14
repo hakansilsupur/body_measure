@@ -1,12 +1,15 @@
 package com.bodymeasure.app.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -19,13 +22,22 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bodymeasure.app.R
+import coil.compose.AsyncImage
 import com.bodymeasure.app.data.Measurement
+import com.bodymeasure.app.data.PhotoStore
 import com.bodymeasure.app.util.Bmi
 import com.bodymeasure.app.util.BmiCategory
 import com.bodymeasure.app.util.Bmr
@@ -84,6 +96,7 @@ private fun MeasurementRow(m: Measurement, onDelete: () -> Unit, onEdit: () -> U
     } ?: ("" to Color.Unspecified)
 
     val df = rememberDateFormat()
+    var photoViewerOpen by remember { mutableStateOf(false) }
     Card(
         onClick = onEdit,
         modifier = Modifier.fillMaxWidth(),
@@ -154,7 +167,32 @@ private fun MeasurementRow(m: Measurement, onDelete: () -> Unit, onEdit: () -> U
                 Stat("Height", "${fmt(m.heightCm)} cm", modifier = Modifier.weight(1f))
             }
             FlowStats(m)
+
+            val context = LocalContext.current
+            val photo = m.photoFileName
+            if (photo != null && PhotoStore.exists(context, photo)) {
+                AsyncImage(
+                    model = PhotoStore.file(context, photo),
+                    contentDescription = stringResource(R.string.photo_section),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .fillMaxWidth()
+                        .height(160.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .clickable { photoViewerOpen = true }
+                )
+            }
         }
+    }
+
+    val ctx = LocalContext.current
+    val photoName = m.photoFileName
+    if (photoViewerOpen && photoName != null) {
+        PhotoViewerDialog(
+            file = PhotoStore.file(ctx, photoName),
+            onDismiss = { photoViewerOpen = false }
+        )
     }
 }
 

@@ -14,6 +14,8 @@ class MeasurementRepository(private val dao: MeasurementDao) {
 
     suspend fun allTimestamps(): Set<Long> = dao.allTimestamps().toSet()
 
+    suspend fun allPhotoNames(): Set<String> = dao.allPhotoNames().toSet()
+
     suspend fun insertAll(measurements: List<Measurement>) = dao.insertAll(measurements)
 
     suspend fun save(measurement: Measurement): Long = dao.insert(measurement)

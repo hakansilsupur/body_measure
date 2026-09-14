@@ -42,6 +42,7 @@ object MeasurementBackup {
                     putOrNull("bodyFatPct", m.bodyFatPct)
                     putOrNull("bmrKcal", m.bmrKcal)
                     putOrNull("activityFactor", m.activityFactor)
+                    putOrNull("photoFileName", m.photoFileName)
                 }
             )
         }
@@ -103,7 +104,11 @@ object MeasurementBackup {
                 bmi = o.doubleOrNull("bmi") ?: (weight / ((height / 100.0) * (height / 100.0))),
                 bodyFatPct = o.doubleOrNull("bodyFatPct"),
                 bmrKcal = o.doubleOrNull("bmrKcal"),
-                activityFactor = o.doubleOrNull("activityFactor")
+                activityFactor = o.doubleOrNull("activityFactor"),
+                // Photo bytes are not in the JSON; the name only resolves if the
+                // app's photo directory still holds that file.
+                photoFileName = if (o.isNull("photoFileName")) null
+                                else o.optString("photoFileName").ifBlank { null }
             )
         }
         if (out.isEmpty()) throw InvalidBackupException("Backup file contains no usable entries")

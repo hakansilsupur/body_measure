@@ -1,5 +1,6 @@
 package com.bodymeasure.app.ui
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +52,7 @@ import com.bodymeasure.app.util.Bmr
 import com.bodymeasure.app.util.BodyFat
 import com.bodymeasure.app.util.BodyFatCategory
 import com.bodymeasure.app.util.Sex
+import java.io.File
 
 /**
  * Record form. State lives in [draft] (owned by the ViewModel) so a partially
@@ -65,7 +67,11 @@ fun AddMeasurementScreen(
     isEditing: Boolean = false,
     editingId: Long? = null,
     onCancelEdit: () -> Unit = {},
-    onEditDone: () -> Unit = {}
+    onEditDone: () -> Unit = {},
+    onPhotoPicked: (Uri) -> Unit = {},
+    onPhotoCaptured: (String) -> Unit = {},
+    onPhotoRemoved: () -> Unit = {},
+    newCameraTarget: () -> Pair<String, File> = { "" to File("") }
 ) {
     var openGuide by rememberSaveable { mutableStateOf<MeasurementGuide?>(null) }
 
@@ -140,6 +146,15 @@ fun AddMeasurementScreen(
         NumberField(value = draft.thigh, onChange = { draft.thigh = it },
             label = stringResource(R.string.thigh_cm),
             onInfoClick = { openGuide = MeasurementGuide.Thigh })
+
+        PhotoSection(
+            photoFileName = draft.photoFileName,
+            onPicked = onPhotoPicked,
+            onCaptured = onPhotoCaptured,
+            onRemove = onPhotoRemoved,
+            newCameraTarget = newCameraTarget,
+            showMessage = showMessage
+        )
 
         Text(
             text = stringResource(

@@ -11,6 +11,7 @@ import com.bodymeasure.app.data.Measurement
 import com.bodymeasure.app.data.MeasurementBackup
 import com.bodymeasure.app.data.MeasurementDatabase
 import com.bodymeasure.app.data.MeasurementRepository
+import com.bodymeasure.app.data.PhotoStore
 import com.bodymeasure.app.util.ActivityLevel
 import com.bodymeasure.app.util.Bmi
 import com.bodymeasure.app.util.Bmr
@@ -41,7 +42,8 @@ data class MeasurementInput(
     val chestCm: Double?,
     val hipCm: Double?,
     val thighCm: Double?,
-    val neckCm: Double?
+    val neckCm: Double?,
+    val photoFileName: String? = null
 )
 
 class MeasurementViewModel(app: Application) : AndroidViewModel(app) {
@@ -74,6 +76,55 @@ class MeasurementViewModel(app: Application) : AndroidViewModel(app) {
         editingId = null
     }
 
+    init {
+        // Reclaim photos left behind by cancelled edits or abandoned drafts. Safe
+        // here because no draft can be holding an unsaved photo at startup.
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                runCatching { PhotoStore.deleteOrphans(app, repo.allPhotoNames()) }
+            }
+        }
+    }
+
+    /**
+     * Copies a picked image into internal storage and points [draft] at it,
+     * discarding any photo the draft previously held.
+     */
+    fun attachPhoto(draft: MeasurementDraft, source: Uri, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val app = getApplication<Application>()
+            val previous = draft.photoFileName
+            val stored = withContext(Dispatchers.IO) { PhotoStore.importFrom(app, source) }
+            if (stored != null) {
+                draft.photoFileName = stored
+                // Only drop the old file once it is no longer referenced by a saved row.
+                withContext(Dispatchers.IO) {
+                    if (previous != null && previous !in repo.allPhotoNames()) {
+                        PhotoStore.delete(app, previous)
+                    }
+                }
+            }
+            onResult(stored != null)
+        }
+    }
+
+    /** Detaches the draft's photo, deleting the file if no saved entry uses it. */
+    fun clearPhoto(draft: MeasurementDraft) {
+        val name = draft.photoFileName ?: return
+        draft.photoFileName = null
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                if (name !in repo.allPhotoNames()) PhotoStore.delete(getApplication(), name)
+            }
+        }
+    }
+
+    /** A photo file the camera can write straight into, plus its target name. */
+    fun newCameraTarget(): Pair<String, java.io.File> {
+        val name = PhotoStore.newFileName()
+        return name to PhotoStore.file(getApplication(), name)
+    }
+
     /**
      * Persist [input]. When [editingId] is null a new row is inserted; otherwise
      * the existing row is updated in place, preserving its original timestamp so
@@ -98,13 +149,33 @@ class MeasurementViewModel(app: Application) : AndroidViewModel(app) {
                 id = existing?.id ?: 0L,
                 timestamp = existing?.timestamp ?: System.currentTimeMillis()
             )
-            if (existing == null) repo.save(entry) else repo.update(entry)
+            if (existing == null) {
+                repo.save(entry)
+            } else {
+                repo.update(entry)
+                val replaced = existing.photoFileName
+                if (replaced != null && replaced != entry.photoFileName) {
+                    withContext(Dispatchers.IO) {
+                        if (replaced !in repo.allPhotoNames()) {
+                            PhotoStore.delete(getApplication(), replaced)
+                        }
+                    }
+                }
+            }
             onResult(SaveResult.Success)
         }
     }
 
     fun delete(id: Long) {
-        viewModelScope.launch { repo.delete(id) }
+        viewModelScope.launch {
+            val doomed = repo.getById(id)
+            repo.delete(id)
+            doomed?.photoFileName?.let { name ->
+                withContext(Dispatchers.IO) {
+                    if (name !in repo.allPhotoNames()) PhotoStore.delete(getApplication(), name)
+                }
+            }
+        }
     }
 
     /** Writes all recorded history to [uri] as JSON. */
@@ -196,6 +267,7 @@ private fun MeasurementInput.toMeasurement(id: Long, timestamp: Long): Measureme
         bmi = bmi,
         bodyFatPct = bodyFat,
         bmrKcal = bmr,
-        activityFactor = activity?.factor
+        activityFactor = activity?.factor,
+        photoFileName = photoFileName
     )
 }

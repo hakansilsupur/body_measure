@@ -28,6 +28,9 @@ class MeasurementDraft {
     var arm by mutableStateOf("")
     var thigh by mutableStateOf("")
 
+    /** File name of the attached progress photo, or null when none is set. */
+    var photoFileName by mutableStateOf<String?>(null)
+
     /** Clears the measurement fields, keeping sex and activity for the next entry. */
     fun clearMeasurements() {
         age = ""
@@ -39,6 +42,7 @@ class MeasurementDraft {
         chest = ""
         arm = ""
         thigh = ""
+        photoFileName = null
     }
 
     /** Replaces all fields with the values of a stored entry, for editing. */
@@ -54,6 +58,7 @@ class MeasurementDraft {
         chest = m.chestCm.toField()
         arm = m.armCm.toField()
         thigh = m.thighCm.toField()
+        photoFileName = m.photoFileName
     }
 
     /** Builds the input for persistence, or null if weight/height aren't valid. */
@@ -72,7 +77,8 @@ class MeasurementDraft {
             chestCm = chest.toDoubleOrNull(),
             hipCm = hip.toDoubleOrNull(),
             thighCm = thigh.toDoubleOrNull(),
-            neckCm = neck.toDoubleOrNull()
+            neckCm = neck.toDoubleOrNull(),
+            photoFileName = photoFileName
         )
     }
 }

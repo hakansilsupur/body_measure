@@ -7,6 +7,7 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
 
 - Record weight & height — BMI is computed automatically.
 - Optional measurements: neck, waist, hip, chest, arm, thigh (all in cm).
+- Optional progress photo attached to each entry, shown in history.
 - Body-fat % (U.S. Navy tape method) computed automatically when the required
   measurements are present.
 - BMR (Mifflin-St Jeor) computed when age, weight, and height are present.
@@ -151,6 +152,31 @@ lets a future build recognise and upgrade older backup files; a file claiming a
 
 No storage permission is required — both actions go through the system file
 picker, so the app only ever touches the single file you point it at.
+
+**Photos are not included in the JSON backup.** Image bytes would bloat the file
+by megabytes per entry. The photo's file name is exported so the link survives a
+restore *on the same device*, but after an uninstall the images themselves are
+gone and those entries simply show no photo.
+
+## Progress photos
+
+Each entry can carry one photo. The Record form has a **Progress photo** section
+with **Take photo** and **Choose photo**; the image appears on that entry's card
+in History, and tapping it opens a full-size view.
+
+Neither button needs a runtime permission. Gallery selection uses the system
+photo picker, which hands back only the one image you choose. Camera capture
+writes through a `FileProvider` into the app's own directory, which is why no
+`CAMERA` permission is declared.
+
+Selected images are **copied into internal storage** rather than referenced by
+their original URI, because those URIs are permission-scoped and go stale — an
+entry pointing at one would eventually fail to load. The trade-off is disk use:
+photos live under the app's private files directory and count toward its storage.
+
+Files are cleaned up when they stop being referenced — removing a photo,
+replacing it, or deleting the entry. Images orphaned by a cancelled edit are
+swept on next launch.
 
 ## BMI reference
 

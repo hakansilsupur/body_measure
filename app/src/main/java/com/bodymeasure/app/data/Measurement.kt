@@ -20,5 +20,7 @@ data class Measurement(
     val bmi: Double,
     val bodyFatPct: Double? = null,
     val bmrKcal: Double? = null,
-    val activityFactor: Double? = null
+    val activityFactor: Double? = null,
+    /** File name inside [PhotoStore]'s directory, not a full path or content URI. */
+    val photoFileName: String? = null
 )
