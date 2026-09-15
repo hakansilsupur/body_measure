@@ -302,25 +302,35 @@ photo of the technique and short text instructions.
 
 ### The diagrams
 
-Each guide ships a **bundled vector diagram** showing a body silhouette with the
-tape placed where it belongs. They always render — offline, at any screen
-density, in light or dark theme — and carry no licensing question.
+Each guide ships a **labelled anatomical diagram**: a body figure with the tape
+drawn where it belongs, the relevant landmark marked with a dot, and a caption
+naming the landmark — Adam's apple, nipple line, navel, gluteal fold, the
+shoulder-to-elbow midpoint. The landmarks are the point: a plain silhouette with
+a band on it does not tell you where to put the tape.
 
-Photographs were considered and rejected: images demonstrating measurement
-technique are almost entirely stock-licensed, and bundling those (or hotlinking
-them) would be copyright infringement. Freely-licensed alternatives exist for
-waist and hip but not for neck, chest, arm or thigh, which would have left most
-guides broken.
+They are PNG rather than VectorDrawable because Android vector drawables cannot
+render text, and the labels are the useful half.
 
-The diagrams are generated, not hand-written. Edit
-`tools/generate_measure_figures.py` and re-run it to regenerate both the PNG
-previews (for eyeballing the result) and the Android vector drawables in
-`app/src/main/res/drawable/measure_*.xml`:
+Photographs were attempted and rejected. Images demonstrating measurement
+technique are almost entirely stock-licensed, so bundling or hotlinking them
+would be infringement; freely-licensed alternatives exist for waist and hip but
+not for neck, chest, arm or thigh, which would have left most guides blank.
+
+The diagrams are generated, not hand-drawn. Edit
+`tools/generate_measure_figures.py` and re-run it:
 
 ```sh
 pip install cairosvg
-python3 tools/generate_measure_figures.py /tmp/figure-preview
+# regenerate the shipped images
+python3 tools/generate_measure_figures.py app/src/main/res/drawable-nodpi
+# or render somewhere else, keeping the .svg sources for inspection
+PREVIEW_DIR=/tmp/fig python3 tools/generate_measure_figures.py /tmp/fig
 ```
+
+Layout is a fixed landscape canvas: figure on the left, label gutter on the
+right, caption strip along the bottom, with the figure clipped to its box. That
+is what keeps labels from being cut off and captions from landing on top of the
+body — all three went wrong in earlier attempts.
 
 ### Using photographs instead
 
