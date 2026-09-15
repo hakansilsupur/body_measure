@@ -300,29 +300,35 @@ The six tape-measurement fields (neck, waist, hip, chest, arm, thigh) on the
 Record screen each show a small ⓘ icon. Tapping it opens a dialog with a
 photo of the technique and short text instructions.
 
-### Setting up the photos
+### The diagrams
 
-Photos are loaded **from URLs at runtime** rather than bundled into the app —
-this keeps you in control of which images are used and respects their
-licenses. By default the URLs are empty and the dialog renders a "no image
-set" placeholder so the text instructions still display.
+Each guide ships a **bundled vector diagram** showing a body silhouette with the
+tape placed where it belongs. They always render — offline, at any screen
+density, in light or dark theme — and carry no licensing question.
 
-To wire up real photos:
+Photographs were considered and rejected: images demonstrating measurement
+technique are almost entirely stock-licensed, and bundling those (or hotlinking
+them) would be copyright infringement. Freely-licensed alternatives exist for
+waist and hip but not for neck, chest, arm or thigh, which would have left most
+guides broken.
 
-1. Open `app/src/main/java/com/bodymeasure/app/ui/MeasurementGuide.kt`.
-2. For each entry (`Neck`, `Waist`, …), set `imageUrl` to a direct image URL
-   (must end in `.jpg`, `.png`, etc., not a webpage that *contains* an image).
-3. If the image requires attribution (e.g. CC-BY-SA), set `attribution` to
-   the credit string — it's rendered under the photo.
-4. Rebuild.
+The diagrams are generated, not hand-written. Edit
+`tools/generate_measure_figures.py` and re-run it to regenerate both the PNG
+previews (for eyeballing the result) and the Android vector drawables in
+`app/src/main/res/drawable/measure_*.xml`:
 
-Suggested sources of freely-licensed photos:
+```sh
+pip install cairosvg
+python3 tools/generate_measure_figures.py /tmp/figure-preview
+```
 
-- **Wikimedia Commons** (CC-BY-SA / CC0) — use the *Special:FilePath* URL,
-  e.g. `https://commons.wikimedia.org/wiki/Special:FilePath/<filename>.jpg`
-- **Pexels / Unsplash / Pixabay** — generally free for commercial use,
-  attribution optional but appreciated. Use the direct CDN image URL.
-- Your own photos hosted on a static URL (GitHub Pages, an S3 bucket, etc.).
+### Using photographs instead
 
-Don't paste random image URLs from a Google search — those are typically
-copyrighted stock photos and embedding them in an app would be infringement.
+If you have photos you hold the rights to, set `imageUrl` on the relevant entry
+in `app/src/main/java/com/bodymeasure/app/ui/MeasurementGuide.kt` to a direct
+image URL. It takes precedence over the bundled diagram. Set `attribution` when
+the licence requires a credit — it renders beneath the image. Suitable sources
+are your own photos on a static host, or CC-licensed images from Wikimedia
+Commons (`https://commons.wikimedia.org/wiki/Special:FilePath/<filename>.jpg`).
+Don't use image URLs found through a search engine; those are almost always
+copyrighted stock.

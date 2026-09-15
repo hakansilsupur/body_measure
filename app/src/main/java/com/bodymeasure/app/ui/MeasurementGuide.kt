@@ -1,6 +1,8 @@
 package com.bodymeasure.app.ui
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
@@ -30,56 +33,51 @@ import coil.request.ImageRequest
 import com.bodymeasure.app.R
 
 /**
- * How-to-measure tutorial entries. Each guide loads its image from a URL at
- * runtime — replace the URLs below with photos you have permission to use
- * (e.g. CC-licensed Wikimedia Commons images, your own photos hosted on a
- * static URL, etc.). An empty URL renders a "no image set" placeholder so
- * the text instructions still display.
+ * How-to-measure tutorial entries.
  *
- * Why URLs instead of bundled images? Bundling stock photos would require a
- * license per image. Loading from URLs keeps the licensing decision (and
- * attribution) under your control.
+ * Each guide ships a bundled diagram ([imageRes]) so the dialog always shows
+ * something, offline and with no licensing question. Photographs of measurement
+ * technique are almost all stock-licensed, so they cannot be bundled here.
+ *
+ * To use a photo instead, set [imageUrl] to a direct image URL you have the
+ * right to use; it takes precedence over the bundled diagram. Set [attribution]
+ * when the licence requires a credit and it renders under the image.
  */
 enum class MeasurementGuide(
     @StringRes val titleRes: Int,
-    val imageUrl: String,
+    @DrawableRes val imageRes: Int,
+    val imageUrl: String = "",
     val attribution: String? = null,
     @StringRes val textRes: Int
 ) {
     Neck(
         titleRes = R.string.guide_neck_title,
-        imageUrl = "",
-        attribution = null,
+        imageRes = R.drawable.measure_neck,
         textRes = R.string.guide_neck_text
     ),
     Waist(
         titleRes = R.string.guide_waist_title,
-        imageUrl = "",
-        attribution = null,
+        imageRes = R.drawable.measure_waist,
         textRes = R.string.guide_waist_text
     ),
     Hip(
         titleRes = R.string.guide_hip_title,
-        imageUrl = "",
-        attribution = null,
+        imageRes = R.drawable.measure_hip,
         textRes = R.string.guide_hip_text
     ),
     Chest(
         titleRes = R.string.guide_chest_title,
-        imageUrl = "",
-        attribution = null,
+        imageRes = R.drawable.measure_chest,
         textRes = R.string.guide_chest_text
     ),
     Arm(
         titleRes = R.string.guide_arm_title,
-        imageUrl = "",
-        attribution = null,
+        imageRes = R.drawable.measure_arm,
         textRes = R.string.guide_arm_text
     ),
     Thigh(
         titleRes = R.string.guide_thigh_title,
-        imageUrl = "",
-        attribution = null,
+        imageRes = R.drawable.measure_thigh,
         textRes = R.string.guide_thigh_text
     )
 }
@@ -91,7 +89,11 @@ fun MeasurementGuideDialog(guide: MeasurementGuide, onDismiss: () -> Unit) {
         title = { Text(stringResource(guide.titleRes)) },
         text = {
             Column {
-                GuideImage(url = guide.imageUrl, contentDescription = stringResource(guide.titleRes))
+                GuideImage(
+                    url = guide.imageUrl,
+                    fallbackRes = guide.imageRes,
+                    contentDescription = stringResource(guide.titleRes)
+                )
                 guide.attribution?.takeIf { it.isNotBlank() }?.let { credit ->
                     Spacer(Modifier.height(4.dp))
                     Text(
@@ -116,7 +118,11 @@ fun MeasurementGuideDialog(guide: MeasurementGuide, onDismiss: () -> Unit) {
 }
 
 @Composable
-private fun GuideImage(url: String, contentDescription: String) {
+private fun GuideImage(
+    url: String,
+    @DrawableRes fallbackRes: Int,
+    contentDescription: String
+) {
     val box = Modifier
         .fillMaxWidth()
         .height(220.dp)
@@ -124,12 +130,12 @@ private fun GuideImage(url: String, contentDescription: String) {
         .background(MaterialTheme.colorScheme.surfaceVariant)
 
     if (url.isBlank()) {
-        Box(modifier = box, contentAlignment = Alignment.Center) {
-            Text(
-                text = stringResource(R.string.guide_no_image),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(16.dp)
+        Box(modifier = box.padding(8.dp), contentAlignment = Alignment.Center) {
+            Image(
+                painter = painterResource(fallbackRes),
+                contentDescription = contentDescription,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize()
             )
         }
         return
