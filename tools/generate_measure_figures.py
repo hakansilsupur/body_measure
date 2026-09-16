@@ -35,90 +35,34 @@ CAP_Y = 316                   # caption baseline
 
 
 # ---------------------------------------------------------------- body parts
-# Outline figure in the style of a tailor's measurement chart: near-white fill
-# with a firm outline, limbs drawn under the torso so the joints hide.
+# The body is a supplied line-art template (tools/assets/base_figure.png),
+# drawn front and back. Overlays are positioned in that image's own pixel
+# coordinates, so the landmark table below is measured directly off it.
 
-def _p(d, w=2.0, fill=None):
-    return (f'<path d="{d}" fill="{fill or SKIN}" stroke="{EDGE}" '
-            f'stroke-width="{w}" stroke-linejoin="round"/>')
+BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "base_figure.png")
+BASE_W, BASE_H = 960, 1090
 
-
-def legs():
-    left = _p(
-        "M112,312 C106,342 104,374 106,406 C108,440 112,472 114,496 "
-        "C115,508 116,516 118,522 L142,522 "
-        "C143,508 144,488 145,464 C146,430 147,394 148,358 "
-        "C149,342 150,330 150,324 Z"
-    )
-    right = _p(
-        "M188,312 C194,342 196,374 194,406 C192,440 188,472 186,496 "
-        "C185,508 184,516 182,522 L158,522 "
-        "C157,508 156,488 155,464 C154,430 153,394 152,358 "
-        "C151,342 150,330 150,324 Z"
-    )
-    return left + right
+# Landmarks measured from the front figure, in base-image pixels.
+# cx/rx describe the body width at that height, so the tape ellipse matches it.
+NECK   = dict(y=196, cx=315, rx=43)
+CHEST  = dict(y=288, cx=316, rx=89)
+WAIST  = dict(y=412, cx=316, rx=73)
+HIP    = dict(y=521, cx=313, rx=102)
+BICEP  = dict(y=332, cx=203, rx=26)
+THIGH  = dict(y=660, cx=255, rx=45)
+NAVEL  = (316, 400)
+NIPPLES = ((277, 286), (355, 286))
+GLUTEAL_FOLD = (255, 630)
 
 
-def arms():
-    left = _p(
-        "M100,120 C88,130 82,150 80,174 C78,200 78,226 80,248 "
-        "C81,262 83,274 86,284 C90,291 98,290 101,283 "
-        "C102,262 104,236 108,210 C111,184 115,152 119,132 Z"
-    )
-    right = _p(
-        "M200,120 C212,130 218,150 220,174 C222,200 222,226 220,248 "
-        "C219,262 217,274 214,284 C210,291 202,290 199,283 "
-        "C198,262 196,236 192,210 C189,184 185,152 181,132 Z"
-    )
-    return left + right
-
-
-def torso():
-    return _p(
-        "M118,98 C108,104 100,116 96,136 C93,158 96,182 104,204 "
-        "C101,222 99,244 102,266 C104,288 108,304 112,316 L188,316 "
-        "C192,304 196,288 198,266 C201,244 199,222 196,204 "
-        "C204,182 207,158 204,136 C200,116 192,104 182,98 Z"
-    )
-
-
-def neck():
-    return _p("M136,68 L134,100 L166,100 L164,68 Z")
-
-
-def head():
-    return (f'<ellipse cx="150" cy="44" rx="25" ry="31" fill="{SKIN}" '
-            f'stroke="{EDGE}" stroke-width="2"/>')
-
-
-def detail():
-    """Interior anatomy lines: collarbone, pectoral crease, centre line."""
-    d = lambda p, w=1.4: (f'<path d="{p}" fill="none" stroke="{DETAIL}" '
-                          f'stroke-width="{w}" stroke-linecap="round"/>')
-    return (
-        d("M120,110 Q150,120 180,110")                 # clavicles
-        + d("M106,146 Q128,166 148,156")               # left pec
-        + d("M194,146 Q172,166 152,156")               # right pec
-        + d("M150,158 L150,214", 1.2)                  # centre line
-        + d("M134,182 Q150,186 166,182", 1.1)          # rib/ab hint
-        + d("M136,198 Q150,202 164,198", 1.1)
-    )
-
-
-def upper_body():
-    return legs() + arms() + torso() + neck() + head() + detail()
-
-
-def upper_arm():
-    """Single arm, shoulder to just past the elbow, for the arm guide."""
-    return _p(
-        "M150,26 C192,26 216,54 216,96 C216,150 210,208 200,264 "
-        "C194,300 190,318 188,340 C188,360 186,378 182,394 "
-        "C172,404 128,404 118,394 C114,378 112,360 112,340 "
-        "C110,318 106,300 100,264 C90,208 84,150 84,96 "
-        "C84,54 108,26 150,26 Z", 2.4
-    ) + (f'<path d="M150,60 Q168,110 162,170" fill="none" stroke="{DETAIL}" '
-         f'stroke-width="1.4" stroke-linecap="round"/>')
+def figure_image():
+    """Embed the template as a data URI - cairosvg does not resolve file:// hrefs."""
+    import base64
+    with open(BASE, "rb") as fh:
+        b64 = base64.b64encode(fh.read()).decode("ascii")
+    return (f'<image xlink:href="data:image/png;base64,{b64}" x="0" y="0" '
+            f'width="{BASE_W}" height="{BASE_H}" '
+            f'preserveAspectRatio="none"/>')
 
 
 # ------------------------------------------------------------------ overlays
@@ -209,7 +153,8 @@ class Fig:
     def render(self):
         fx, fy, fw, fh = FIG
         return (
-            f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {CW} {CH}" '
+            f'<svg xmlns="http://www.w3.org/2000/svg" '
+            f'xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 {CW} {CH}" '
             f'width="{CW}" height="{CH}">'
             f'<defs><clipPath id="figbox">'
             f'<rect x="{fx}" y="{fy}" width="{fw}" height="{fh}"/>'
@@ -226,61 +171,64 @@ class Fig:
 
 def build():
     figs = {}
+    body = figure_image()
+
+    def W(m):
+        return wrap(m["y"], m["cx"], m["rx"])
 
     # Neck - just below the larynx
-    f = Fig(upper_body(), (66, 8, 168, 140))
-    f.add(f'<path d="M144,84 Q150,77 156,84" fill="none" stroke="{EDGE}" stroke-width="1.8"/>')
-    f.add(wrap(96, 150, 17))
-    f.add(dot(150, 83, 4))
-    f.callout(157, 83, ["Adam\u2019s apple"], dy=-12)
-    f.callout(167, 97, ["tape just below it"], dy=16)
+    f = Fig(body, (205, 28, 220, 293))
+    f.add(W(NECK))
+    f.add(dot(315, 180, 6))
+    f.callout(358, 180, ["Adam\u2019s apple"], dy=-14)
+    f.callout(358, 196, ["tape just below it"], dy=18)
     f.caption("Head straight, tape level \u2014 not sloping down at the front")
     figs["neck"] = f
 
     # Chest - across the nipple line
-    f = Fig(upper_body(), (66, 70, 168, 140))
-    f.add(wrap(152, 150, 54))
-    f.add(dot(126, 161, 4.5) + dot(174, 161, 4.5))
-    f.callout(204, 152, ["across the", "nipple line"], dy=0)
+    f = Fig(body, (166, 105, 300, 400))
+    f.add(W(CHEST))
+    for nx, ny in NIPPLES:
+        f.add(dot(nx, ny, 6))
+    f.callout(CHEST["cx"] + CHEST["rx"], CHEST["y"], ["across the", "nipple line"], dy=0)
     f.caption("Arms relaxed; read at the end of a normal breath out")
     figs["chest"] = f
 
     # Waist - at the navel
-    f = Fig(upper_body(), (66, 140, 168, 140))
-    f.add(dot(150, 232, 4.5))
-    f.add(dashed(232, 108, 192))
-    f.add(wrap(210, 150, 46))
-    f.callout(156, 232, ["navel"], dy=16)
-    f.callout(196, 210, ["narrowest point,", "just above it"], dy=-14)
+    f = Fig(body, (166, 212, 300, 400))
+    f.add(W(WAIST))
+    f.add(dot(*NAVEL, 6))
+    f.callout(NAVEL[0] + 8, NAVEL[1], ["navel"], dy=34)
+    f.callout(WAIST["cx"] + WAIST["rx"], WAIST["y"], ["narrowest point,", "just above it"], dy=-24)
     f.caption("Breathe out; snug, without pulling the tape tight")
     figs["waist"] = f
 
     # Hip - widest point of the buttocks
-    f = Fig(upper_body(), (66, 200, 168, 150))
-    f.add(wrap(276, 150, 50))
-    f.callout(200, 276, ["widest point", "of the hips"], dy=0)
+    f = Fig(body, (166, 322, 300, 400))
+    f.add(W(HIP))
+    f.callout(HIP["cx"] + HIP["rx"], HIP["y"], ["widest point", "of the hips"], dy=0)
     f.caption("Feet together; check side-on to find the widest point")
     figs["hip"] = f
 
     # Arm - midway between shoulder and elbow
-    f = Fig(upper_arm(), (70, 10, 160, 410))
-    f.add(dot(150, 40))
-    f.add(dot(150, 350))
-    f.add(wrap(196, 150, 64))
-    f.callout(150, 40, ["tip of shoulder"], dy=-8)
-    f.callout(150, 350, ["elbow"], dy=8)
-    f.callout(214, 196, ["measure midway", "between the two"], dy=0)
+    f = Fig(body, (160, 190, 210, 280))
+    f.add(W(BICEP))
+    f.add(dot(199, 228, 6))
+    f.add(dot(186, 425, 6))
+    f.callout(199, 228, ["tip of shoulder"], dy=-14)
+    f.callout(BICEP["cx"] + BICEP["rx"], BICEP["y"], ["midway between", "the two"], dy=0)
+    f.callout(186, 425, ["elbow"], dy=14)
     f.caption("Arm hanging relaxed at your side")
     figs["arm"] = f
 
     # Thigh - just below the gluteal fold
-    f = Fig(upper_body(), (96, 296, 118, 180))
-    f.add(f'<path d="M108,330 Q128,342 148,332" fill="none" stroke="{DETAIL}" '
-          f'stroke-width="1.8" stroke-dasharray="6 4"/>')
-    f.add(dot(127, 337, 4.5))
-    f.add(wrap(362, 127, 21))
-    f.callout(148, 333, ["gluteal fold \u2014 where the", "buttock meets the thigh"], dy=-18)
-    f.callout(148, 362, ["tape just below it,", "around the widest part"], dy=16)
+    f = Fig(body, (172, 520, 240, 320))
+    f.add(f'<path d="M212,{GLUTEAL_FOLD[1]} Q255,{GLUTEAL_FOLD[1]+14} 298,{GLUTEAL_FOLD[1]-2}" '
+          f'fill="none" stroke="{GUIDE}" stroke-width="2.5" stroke-dasharray="7 5"/>')
+    f.add(dot(*GLUTEAL_FOLD, 6))
+    f.add(W(THIGH))
+    f.callout(298, GLUTEAL_FOLD[1], ["gluteal fold \u2014 where the", "buttock meets the thigh"], dy=-20)
+    f.callout(THIGH["cx"] + THIGH["rx"], THIGH["y"], ["tape just below it,", "around the widest part"], dy=18)
     f.caption("Weight even on both feet; tape level with the floor")
     figs["thigh"] = f
 
