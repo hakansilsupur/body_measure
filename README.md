@@ -302,11 +302,15 @@ photo of the technique and short text instructions.
 
 ### The diagrams
 
-Each guide ships a **labelled anatomical diagram**: a body figure with the tape
-drawn where it belongs, the relevant landmark marked with a dot, and a caption
-naming the landmark — Adam's apple, nipple line, navel, gluteal fold, the
-shoulder-to-elbow midpoint. The landmarks are the point: a plain silhouette with
-a band on it does not tell you where to put the tape.
+Each guide ships a **labelled anatomical diagram** drawn in the style of a
+tailor's measurement chart: an outline figure, the tape drawn as an ellipse in
+perspective — solid across the front, dashed where it passes behind — and the
+relevant landmark marked and named: Adam's apple, nipple line, navel, gluteal
+fold, the shoulder-to-elbow midpoint.
+
+Both details matter. A flat bar across a filled silhouette does not read as
+something you wrap around yourself, and without a named landmark the diagram
+never says *where* to put the tape.
 
 They are PNG rather than VectorDrawable because Android vector drawables cannot
 render text, and the labels are the useful half.
