@@ -16,6 +16,8 @@ import com.bodymeasure.app.util.Sex
  * remembered state goes with it.
  */
 class MeasurementDraft {
+    /** When the measurement was taken. Editable, so past sessions can be logged. */
+    var timestamp by mutableStateOf(System.currentTimeMillis())
     var sex by mutableStateOf(Sex.Male)
     var activity by mutableStateOf<ActivityLevel?>(null)
     var age by mutableStateOf("")
@@ -31,8 +33,13 @@ class MeasurementDraft {
     /** File name of the attached progress photo, or null when none is set. */
     var photoFileName by mutableStateOf<String?>(null)
 
-    /** Clears the measurement fields, keeping sex and activity for the next entry. */
+    /**
+     * Clears the measurement fields, keeping sex and activity for the next entry.
+     * The date resets to today: carrying a back-dated value forward silently
+     * would file the next entry under the wrong day.
+     */
     fun clearMeasurements() {
+        timestamp = System.currentTimeMillis()
         age = ""
         weight = ""
         height = ""
@@ -47,6 +54,7 @@ class MeasurementDraft {
 
     /** Replaces all fields with the values of a stored entry, for editing. */
     fun loadFrom(m: Measurement) {
+        timestamp = m.timestamp
         sex = runCatching { Sex.valueOf(m.sex) }.getOrDefault(Sex.Male)
         activity = ActivityLevel.fromFactor(m.activityFactor)
         age = m.ageYears?.toString() ?: ""
@@ -67,6 +75,7 @@ class MeasurementDraft {
         val h = height.toDoubleOrNull() ?: return null
         if (w <= 0 || h <= 0) return null
         return MeasurementInput(
+            timestamp = timestamp,
             sex = sex,
             ageYears = age.toIntOrNull(),
             activity = activity,

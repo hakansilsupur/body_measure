@@ -15,12 +15,16 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,6 +35,8 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,6 +59,10 @@ import com.bodymeasure.app.util.BodyFat
 import com.bodymeasure.app.util.BodyFatCategory
 import com.bodymeasure.app.util.Sex
 import java.io.File
+import java.text.DateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.TimeZone
 
 /**
  * Record form. State lives in [draft] (owned by the ViewModel) so a partially
@@ -119,6 +129,7 @@ fun AddMeasurementScreen(
             tdeeKcal = livePreviewTdee
         )
 
+        DateField(timestamp = draft.timestamp, onChange = { draft.timestamp = it })
         SexSelector(sex = draft.sex, onChange = { draft.sex = it })
         ActivitySelector(activity = draft.activity, onChange = { draft.activity = it })
 
@@ -239,6 +250,85 @@ private fun EditingBanner(onCancel: () -> Unit) {
             }
         }
     }
+}
+
+/**
+ * Shows the measurement date and opens a picker to change it, so a session can
+ * be logged after the fact rather than always being stamped "now".
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DateField(timestamp: Long, onChange: (Long) -> Unit) {
+    var open by rememberSaveable { mutableStateOf(false) }
+    val fmt = remember { DateFormat.getDateInstance(DateFormat.LONG) }
+
+    Column {
+        Text(
+            stringResource(R.string.measurement_date),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+        OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth()) {
+            Icon(Icons.Default.CalendarToday, contentDescription = null)
+            Text(
+                fmt.format(Date(timestamp)),
+                modifier = Modifier.weight(1f).padding(start = 12.dp)
+            )
+            Text(stringResource(R.string.change_date))
+        }
+    }
+
+    if (open) {
+        val state = rememberDatePickerState(
+            initialSelectedDateMillis = localDayToUtcMillis(timestamp)
+        )
+        DatePickerDialog(
+            onDismissRequest = { open = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    state.selectedDateMillis?.let { onChange(withPickedDay(it, timestamp)) }
+                    open = false
+                }) { Text(stringResource(R.string.ok)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { open = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        ) {
+            DatePicker(state = state)
+        }
+    }
+}
+
+/**
+ * DatePicker speaks UTC: it reports a chosen day as UTC midnight. These two
+ * helpers convert across that boundary so the day shown is the day stored,
+ * whatever the device's timezone.
+ */
+private fun localDayToUtcMillis(localMillis: Long): Long {
+    val local = Calendar.getInstance().apply { timeInMillis = localMillis }
+    return Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+        clear()
+        set(
+            local.get(Calendar.YEAR),
+            local.get(Calendar.MONTH),
+            local.get(Calendar.DAY_OF_MONTH)
+        )
+    }.timeInMillis
+}
+
+/** Takes the calendar day from the picker, keeps the time of day from [existing]. */
+private fun withPickedDay(pickedUtcMillis: Long, existing: Long): Long {
+    val picked = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        .apply { timeInMillis = pickedUtcMillis }
+    return Calendar.getInstance().apply {
+        timeInMillis = existing
+        set(Calendar.YEAR, picked.get(Calendar.YEAR))
+        set(Calendar.MONTH, picked.get(Calendar.MONTH))
+        set(Calendar.DAY_OF_MONTH, picked.get(Calendar.DAY_OF_MONTH))
+    }.timeInMillis
 }
 
 @Composable

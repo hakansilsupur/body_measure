@@ -7,6 +7,8 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
 
 - Record weight & height — BMI is computed automatically.
 - Optional measurements: neck, waist, hip, chest, arm, thigh (all in cm).
+- Measurement date is editable, so a session can be logged after the fact;
+  history, charts and analysis all order by that date.
 - Optional progress photo attached to each entry, shown in history.
 - Body-fat % (U.S. Navy tape method) computed automatically when the required
   measurements are present.
@@ -199,6 +201,26 @@ medical thresholds — the "ideal" figures circulated in fitness writing are
 aesthetic conventions, so the app reports the numbers and leaves them
 uncoloured. The exception is absolute thigh circumference, which has an actual
 cohort study behind it and is labelled with its source and its limits.
+
+## Measurement dates
+
+New entries default to today, and the **Measurement date** field at the top of
+the Record form opens a picker to change it — useful for entering a session you
+measured but didn't log, or correcting a mistyped day. Editing an existing entry
+lets you change its date too, and the entry moves to its correct place in
+history.
+
+Two details worth knowing:
+
+- Only the calendar day changes; the time of day is preserved, so several
+  entries on the same date keep a stable order. Ties are broken by insert order.
+- After saving, the date resets to today rather than staying on the value you
+  just used. Carrying a back-dated value forward silently would file the next
+  entry under the wrong day.
+
+Everything that reads history — the list, the Trends charts, and the Analysis
+tab's "latest entry" and "change over time" — sorts by this date, not by when
+the row happened to be created.
 
 ## Progress photos
 

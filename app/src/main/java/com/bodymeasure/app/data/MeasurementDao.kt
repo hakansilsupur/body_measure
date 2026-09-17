@@ -10,17 +10,17 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface MeasurementDao {
 
-    @Query("SELECT * FROM measurements ORDER BY timestamp DESC")
+    @Query("SELECT * FROM measurements ORDER BY timestamp DESC, id DESC")
     fun observeAll(): Flow<List<Measurement>>
 
-    @Query("SELECT * FROM measurements ORDER BY timestamp DESC LIMIT 1")
+    @Query("SELECT * FROM measurements ORDER BY timestamp DESC, id DESC LIMIT 1")
     fun observeLatest(): Flow<Measurement?>
 
     @Query("SELECT * FROM measurements WHERE id = :id")
     suspend fun getById(id: Long): Measurement?
 
     /** One-shot read of everything, for export. */
-    @Query("SELECT * FROM measurements ORDER BY timestamp DESC")
+    @Query("SELECT * FROM measurements ORDER BY timestamp DESC, id DESC")
     suspend fun getAllOnce(): List<Measurement>
 
     /** Used to skip entries already present when importing. */

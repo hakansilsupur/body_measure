@@ -9,6 +9,9 @@
     <string name="sex_male">Male</string>
     <string name="sex_female">Female</string>
 
+    <string name="measurement_date">Measurement date</string>
+    <string name="change_date">Change</string>
+    <string name="ok">OK</string>
     <string name="age_years">Age (years)</string>
     <string name="weight_kg">Weight (kg)</string>
     <string name="height_cm">Height (cm)</string>

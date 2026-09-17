@@ -32,6 +32,7 @@ sealed interface SaveResult {
 
 /** All user-entered values from the Record form, before derived metrics. */
 data class MeasurementInput(
+    val timestamp: Long,
     val sex: Sex,
     val ageYears: Int?,
     val activity: ActivityLevel?,
@@ -127,8 +128,8 @@ class MeasurementViewModel(app: Application) : AndroidViewModel(app) {
 
     /**
      * Persist [input]. When [editingId] is null a new row is inserted; otherwise
-     * the existing row is updated in place, preserving its original timestamp so
-     * edits don't reorder history.
+     * the existing row is updated in place. The date comes from the input, so
+     * editing it moves the entry to its correct position in history.
      */
     fun save(
         input: MeasurementInput,
@@ -145,10 +146,7 @@ class MeasurementViewModel(app: Application) : AndroidViewModel(app) {
                 onResult(SaveResult.Error("That entry no longer exists"))
                 return@launch
             }
-            val entry = input.toMeasurement(
-                id = existing?.id ?: 0L,
-                timestamp = existing?.timestamp ?: System.currentTimeMillis()
-            )
+            val entry = input.toMeasurement(id = existing?.id ?: 0L)
             if (existing == null) {
                 repo.save(entry)
             } else {
@@ -241,7 +239,7 @@ sealed interface TransferResult {
     data class Failed(val message: String) : TransferResult
 }
 
-private fun MeasurementInput.toMeasurement(id: Long, timestamp: Long): Measurement {
+private fun MeasurementInput.toMeasurement(id: Long): Measurement {
     val bmi = Bmi.calculate(weightKg, heightCm)
     val bodyFat = BodyFat.calculate(
         sex = sex,
