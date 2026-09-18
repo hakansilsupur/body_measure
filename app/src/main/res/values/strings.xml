@@ -26,6 +26,8 @@
     <string name="clear">Clear</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
+    <string name="expand">Show details</string>
+    <string name="collapse">Hide details</string>
     <string name="update">Update</string>
     <string name="cancel">Cancel</string>
     <string name="updated">Entry updated</string>

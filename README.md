@@ -22,7 +22,8 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
   healthy weight range, all derived from what you already entered.
 - **How-to-measure illustrations**: tap the info icon next to any measurement
   field to see a small diagram and instructions for proper tape placement.
-- History of all entries, sorted newest first, with per-entry delete.
+- History of all entries, newest first: collapsed cards showing date, BMI,
+  body fat and FFMI, tap to expand for the full breakdown, edit and delete.
 - Local-only storage via Room — no network, no accounts.
 - Material 3 UI with dynamic color (Android 12+) and dark mode.
 
