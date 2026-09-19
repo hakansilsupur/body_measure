@@ -6,7 +6,7 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
 ## Features
 
 - Record weight & height — BMI is computed automatically.
-- Optional measurements: neck, waist, hip, chest, arm, thigh (all in cm).
+- Optional measurements: neck, waist, hip, chest, arm, thigh, calf (all in cm).
 - Measurement date is editable, so a session can be logged after the fact;
   history, charts and analysis all order by that date.
 - Optional progress photo attached to each entry, shown in history.
@@ -17,7 +17,7 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
   picked.
 - Live BMI / body-fat / BMR / TDEE preview card as you type.
 - **Trends tab** charting every recorded value over time — BMI, weight, body
-  fat, BMR, and each circumference (waist, chest, arm, thigh, hip, neck).
+  fat, BMR, and each circumference (waist, chest, arm, thigh, calf, hip, neck).
 - **Analysis tab**: lean/fat mass, FFMI, waist-to-height, waist-to-hip and
   healthy weight range, all derived from what you already entered.
 - **How-to-measure illustrations**: tap the info icon next to any measurement

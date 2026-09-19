@@ -50,6 +50,8 @@ WAIST  = dict(y=412, cx=316, rx=73)
 HIP    = dict(y=521, cx=313, rx=102)
 BICEP  = dict(y=332, cx=203, rx=26)
 THIGH  = dict(y=660, cx=255, rx=45)
+CALF   = dict(y=838, cx=227, rx=32)   # calf belly - widest point of the lower leg
+KNEE   = (231, 786)                   # narrowest point above it
 NAVEL  = (316, 400)
 NIPPLES = ((277, 286), (355, 286))
 GLUTEAL_FOLD = (255, 630)
@@ -231,6 +233,15 @@ def build():
     f.callout(THIGH["cx"] + THIGH["rx"], THIGH["y"], ["tape just below it,", "around the widest part"], dy=18)
     f.caption("Weight even on both feet; tape level with the floor")
     figs["thigh"] = f
+
+    # Calf - widest point of the lower leg
+    f = Fig(body, (170, 716, 168, 224))
+    f.add(W(CALF))
+    f.add(dot(*KNEE, 6))
+    f.callout(KNEE[0] + 22, KNEE[1], ["knee"], dy=-12)
+    f.callout(CALF["cx"] + CALF["rx"], CALF["y"], ["widest part of", "the calf"], dy=6)
+    f.caption("Stand with weight on both feet; tape level with the floor")
+    figs["calf"] = f
 
     return figs
 

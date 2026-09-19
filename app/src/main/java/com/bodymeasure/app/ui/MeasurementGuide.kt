@@ -79,6 +79,11 @@ enum class MeasurementGuide(
         titleRes = R.string.guide_thigh_title,
         imageRes = R.drawable.measure_thigh,
         textRes = R.string.guide_thigh_text
+    ),
+    Calf(
+        titleRes = R.string.guide_calf_title,
+        imageRes = R.drawable.measure_calf,
+        textRes = R.string.guide_calf_text
     )
 }
 

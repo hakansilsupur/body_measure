@@ -157,6 +157,9 @@ fun AddMeasurementScreen(
         NumberField(value = draft.thigh, onChange = { draft.thigh = it },
             label = stringResource(R.string.thigh_cm),
             onInfoClick = { openGuide = MeasurementGuide.Thigh })
+        NumberField(value = draft.calf, onChange = { draft.calf = it },
+            label = stringResource(R.string.calf_cm),
+            onInfoClick = { openGuide = MeasurementGuide.Calf })
 
         PhotoSection(
             photoFileName = draft.photoFileName,

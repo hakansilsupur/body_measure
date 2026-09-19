@@ -283,6 +283,7 @@ private fun ProgressCard(items: List<Measurement>) {
         Triple("Chest", "cm", Triple(current.chestCm, previous.chestCm, first.chestCm)),
         Triple("Arm", "cm", Triple(current.armCm, previous.armCm, first.armCm)),
         Triple("Thigh", "cm", Triple(current.thighCm, previous.thighCm, first.thighCm)),
+        Triple("Calf", "cm", Triple(current.calfCm, previous.calfCm, first.calfCm)),
         Triple("Hip", "cm", Triple(current.hipCm, previous.hipCm, first.hipCm)),
         Triple("Neck", "cm", Triple(current.neckCm, previous.neckCm, first.neckCm)),
         Triple("Body fat", "%", Triple(current.bodyFatPct, previous.bodyFatPct, first.bodyFatPct))

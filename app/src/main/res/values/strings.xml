@@ -20,6 +20,7 @@
     <string name="chest_cm">Chest (cm)</string>
     <string name="hip_cm">Hip (cm)</string>
     <string name="thigh_cm">Thigh (cm)</string>
+    <string name="calf_cm">Calf (cm)</string>
     <string name="neck_cm">Neck (cm)</string>
 
     <string name="save">Save</string>
@@ -125,6 +126,7 @@
     <string name="trends_chest">Chest (cm) over time</string>
     <string name="trends_arm">Arm (cm) over time</string>
     <string name="trends_thigh">Thigh (cm) over time</string>
+    <string name="trends_calf">Calf (cm) over time</string>
     <string name="trends_hip">Hip (cm) over time</string>
     <string name="trends_neck">Neck (cm) over time</string>
 
@@ -167,6 +169,9 @@
 
     <string name="guide_arm_title">Measuring your arm</string>
     <string name="guide_arm_text">Let the arm hang relaxed at your side. Find the midpoint between the tip of the shoulder and the elbow. Wrap the tape around the bicep at that midpoint, perpendicular to the long axis of the arm. Keep the tape snug but not compressing.</string>
+
+    <string name="guide_calf_title">Measuring your calf</string>
+    <string name="guide_calf_text">Stand with your weight even on both feet — the calf flattens if the leg is relaxed or raised. Wrap the tape around the widest part of the calf, roughly a third of the way down from the knee, and keep it level with the floor. Measure the same leg each time.</string>
 
     <string name="guide_thigh_title">Measuring your thigh</string>
     <string name="guide_thigh_text">Stand with weight evenly on both feet. Wrap the tape around the largest part of the upper thigh, just below the gluteal fold. Keep the tape parallel to the floor and snug, but not compressing the muscle.</string>
