@@ -56,6 +56,19 @@ NAVEL  = (316, 400)
 NIPPLES = ((277, 286), (355, 286))
 GLUTEAL_FOLD = (255, 630)
 
+# Limb figures share one focus size, so they all render at the same scale and
+# their tapes stay comparable: a calf must look narrower than a thigh because
+# it is. Sizing each focus to its own subject silently rescales the body and
+# the diagrams start contradicting each other.
+LIMB_FOCUS = (240, 320)
+
+
+def limb_focus(cx, cy, x_bias=0.5):
+    """Focus box of the shared limb size, centred on (cx, cy). x_bias shifts the
+    limb off-centre so surrounding body stays in frame."""
+    w, h = LIMB_FOCUS
+    return (int(cx - w * x_bias), int(cy - h / 2), w, h)
+
 
 def figure_image():
     """Embed the template as a data URI - cairosvg does not resolve file:// hrefs."""
@@ -213,7 +226,7 @@ def build():
     figs["hip"] = f
 
     # Arm - midway between shoulder and elbow
-    f = Fig(body, (160, 190, 210, 280))
+    f = Fig(body, limb_focus(BICEP["cx"], BICEP["y"], x_bias=0.28))
     f.add(W(BICEP))
     f.add(dot(199, 228, 6))
     f.add(dot(186, 425, 6))
@@ -224,7 +237,7 @@ def build():
     figs["arm"] = f
 
     # Thigh - just below the gluteal fold
-    f = Fig(body, (172, 520, 240, 320))
+    f = Fig(body, limb_focus(THIGH["cx"], THIGH["y"], x_bias=0.35))
     f.add(f'<path d="M212,{GLUTEAL_FOLD[1]} Q255,{GLUTEAL_FOLD[1]+14} 298,{GLUTEAL_FOLD[1]-2}" '
           f'fill="none" stroke="{GUIDE}" stroke-width="2.5" stroke-dasharray="7 5"/>')
     f.add(dot(*GLUTEAL_FOLD, 6))
@@ -235,7 +248,7 @@ def build():
     figs["thigh"] = f
 
     # Calf - widest point of the lower leg
-    f = Fig(body, (170, 716, 168, 224))
+    f = Fig(body, limb_focus(CALF["cx"], CALF["y"], x_bias=0.28))
     f.add(W(CALF))
     f.add(dot(*KNEE, 6))
     f.callout(KNEE[0] + 22, KNEE[1], ["knee"], dy=-12)
