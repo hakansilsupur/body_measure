@@ -34,8 +34,21 @@ jobs:
         with:
           gradle-version: '8.10.2'
 
+      # This step evaluates the build script, so it resolves every plugin from
+      # the remote repositories and fails the whole run when one of them is
+      # briefly unavailable. Retry before giving up, so a registry blip does
+      # not look like a broken commit.
       - name: Generate Gradle wrapper
-        run: gradle wrapper --gradle-version 8.10.2
+        run: |
+          for attempt in 1 2 3; do
+            if gradle wrapper --gradle-version 8.10.2; then
+              exit 0
+            fi
+            echo "::warning::Gradle wrapper generation failed (attempt $attempt/3), retrying"
+            sleep 20
+          done
+          echo "::error::Gradle wrapper generation failed after 3 attempts"
+          exit 1
 
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug --no-daemon --stacktrace --no-configuration-cache
