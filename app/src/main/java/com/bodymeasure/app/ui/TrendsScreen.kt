@@ -64,6 +64,7 @@ fun TrendsScreen(items: List<Measurement>) {
         ChartSpec(stringResource(R.string.trends_arm), pointsOf { it.armCm }, primary, cm),
         ChartSpec(stringResource(R.string.trends_thigh), pointsOf { it.thighCm }, secondary, cm),
         ChartSpec(stringResource(R.string.trends_calf), pointsOf { it.calfCm }, primary, cm),
+        ChartSpec(stringResource(R.string.trends_wrist), pointsOf { it.wristCm }, tertiary, cm),
         ChartSpec(stringResource(R.string.trends_hip), pointsOf { it.hipCm }, tertiary, cm),
         ChartSpec(stringResource(R.string.trends_neck), pointsOf { it.neckCm }, primary, cm)
     )

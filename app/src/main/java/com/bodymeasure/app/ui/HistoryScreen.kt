@@ -280,7 +280,8 @@ private fun FlowStats(m: Measurement) {
         m.chestCm?.let { "Chest" to "${fmt(it)} cm" },
         m.armCm?.let { "Arm" to "${fmt(it)} cm" },
         m.thighCm?.let { "Thigh" to "${fmt(it)} cm" },
-        m.calfCm?.let { "Calf" to "${fmt(it)} cm" }
+        m.calfCm?.let { "Calf" to "${fmt(it)} cm" },
+        m.wristCm?.let { "Wrist" to "${fmt(it)} cm" }
     )
     if (pairs.isEmpty()) return
     Column(modifier = Modifier.padding(top = 6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {

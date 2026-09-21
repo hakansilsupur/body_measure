@@ -160,6 +160,9 @@ fun AddMeasurementScreen(
         NumberField(value = draft.calf, onChange = { draft.calf = it },
             label = stringResource(R.string.calf_cm),
             onInfoClick = { openGuide = MeasurementGuide.Calf })
+        NumberField(value = draft.wrist, onChange = { draft.wrist = it },
+            label = stringResource(R.string.wrist_cm),
+            onInfoClick = { openGuide = MeasurementGuide.Wrist })
 
         PhotoSection(
             photoFileName = draft.photoFileName,

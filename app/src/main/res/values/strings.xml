@@ -21,6 +21,7 @@
     <string name="hip_cm">Hip (cm)</string>
     <string name="thigh_cm">Thigh (cm)</string>
     <string name="calf_cm">Calf (cm)</string>
+    <string name="wrist_cm">Wrist (cm)</string>
     <string name="neck_cm">Neck (cm)</string>
 
     <string name="save">Save</string>
@@ -114,9 +115,10 @@
 
     <string name="analysis_classic">Classical proportions</string>
     <string name="analysis_classic_help">These ratios come from mid-20th-century bodybuilding — John McCallum\'s figures, rooted in the physiques of Sandow and Steve Reeves. They are one era\'s aesthetic convention, not a health standard: hardly anyone matches the full set, the waist figure is far narrower than most people carry, and none of it says anything about how healthy or strong you are. Shown as a reference to compare against, not a target to hit — which is why nothing here is marked pass or fail.</string>
-    <string name="analysis_classic_anchor">Scaled to your chest of %1$s cm. McCallum anchors chest on wrist girth; the app has no wrist measurement, so your chest is used instead.</string>
+    <string name="analysis_classic_anchor_wrist">Scaled from your wrist of %1$s cm, which puts the classical chest at %2$s cm. Wrist barely changes with training, so these figures stay put as you do.</string>
+    <string name="analysis_classic_anchor_chest">No wrist recorded, so these are scaled from your chest instead. Every other figure is a fraction of the chest, so if your chest sits below the classical one for your frame this understates all of them together — the waist most visibly. Add a wrist measurement for the frame-based version.</string>
     <string name="analysis_classic_symmetry">Classical symmetry also holds arm, neck and calf at about the same girth. Yours span %1$s cm.</string>
-    <string name="analysis_classic_needs">chest, plus any of neck, arm, waist, hip, thigh or calf</string>
+    <string name="analysis_classic_needs">wrist (or chest), plus any of neck, arm, waist, hip, thigh or calf</string>
     <string name="analysis_classic_marker">The tick marks the classical figure</string>
 
     <string name="analysis_thigh_size">Thigh circumference</string>
@@ -134,6 +136,7 @@
     <string name="trends_arm">Arm (cm) over time</string>
     <string name="trends_thigh">Thigh (cm) over time</string>
     <string name="trends_calf">Calf (cm) over time</string>
+    <string name="trends_wrist">Wrist (cm) over time</string>
     <string name="trends_hip">Hip (cm) over time</string>
     <string name="trends_neck">Neck (cm) over time</string>
 
@@ -176,6 +179,9 @@
 
     <string name="guide_arm_title">Measuring your arm</string>
     <string name="guide_arm_text">Let the arm hang relaxed at your side. Find the midpoint between the tip of the shoulder and the elbow. Wrap the tape around the bicep at that midpoint, perpendicular to the long axis of the arm. Keep the tape snug but not compressing.</string>
+
+    <string name="guide_wrist_title">Measuring your wrist</string>
+    <string name="guide_wrist_text">Wrap the tape around the narrowest point of the wrist, just below the bony knob on the outside and above the hand. Keep the hand relaxed and open. Wrist is almost pure bone and tendon, so it barely changes with training or weight — which is what makes it useful as a measure of your frame size.</string>
 
     <string name="guide_calf_title">Measuring your calf</string>
     <string name="guide_calf_text">Stand with your weight even on both feet — the calf flattens if the leg is relaxed or raised. Wrap the tape around the widest part of the calf, roughly a third of the way down from the knee, and keep it level with the floor. Measure the same leg each time.</string>

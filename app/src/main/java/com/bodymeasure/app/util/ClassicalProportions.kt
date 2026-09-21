@@ -13,11 +13,17 @@ package com.bodymeasure.app.util
  *
  * McCallum anchors the chest itself on wrist girth (chest = 6.5 x wrist), the
  * idea being that wrist reflects skeletal frame and does not change with
- * training. The app does not record wrist, so the ratios below are anchored on
- * the recorded chest instead: "given the chest you have, here is where the
- * classical physique puts everything else".
+ * training. That is the faithful form and the app uses it whenever a wrist
+ * measurement exists, falling back to the recorded chest otherwise.
+ *
+ * The fallback is noticeably harsher for anyone whose chest is below the
+ * classical figure for their frame: every other target is a fraction of the
+ * chest, so a smaller chest drags them all down together. Wrist anchoring
+ * removes that feedback loop, which is also why the targets stop moving as
+ * training changes the chest.
  */
 enum class ProportionSite(val label: String, val fractionOfChest: Double) {
+    Chest("Chest", 1.00),
     Neck("Neck", 0.37),
     Arm("Arm", 0.36),
     Waist("Waist", 0.70),
@@ -40,6 +46,28 @@ data class ProportionRow(
 
 object ClassicalProportions {
 
+    /** McCallum derives the classical chest from wrist girth. */
+    const val CHEST_PER_WRIST = 6.5
+
+    /** Where the ratios are being scaled from, and which measurement supplied it. */
+    sealed interface Anchor {
+        val chestCm: Double
+
+        /** The faithful form: chest derived from frame size. */
+        data class FromWrist(val wristCm: Double, override val chestCm: Double) : Anchor
+
+        /** Fallback when no wrist is recorded. */
+        data class FromChest(override val chestCm: Double) : Anchor
+    }
+
+    /** Prefers wrist; falls back to the recorded chest. Null if neither is usable. */
+    fun anchor(wristCm: Double?, chestCm: Double?): Anchor? {
+        wristCm?.takeIf { it > 0 }?.let {
+            return Anchor.FromWrist(it, it * CHEST_PER_WRIST)
+        }
+        return chestCm?.takeIf { it > 0 }?.let { Anchor.FromChest(it) }
+    }
+
     /** The classical figure for [site] given a chest girth, or null if unusable. */
     fun classicFor(site: ProportionSite, chestCm: Double?): Double? {
         if (chestCm == null || chestCm <= 0) return null
@@ -51,6 +79,7 @@ object ClassicalProportions {
      * a derivable classical figure. Sites the user hasn't measured are skipped.
      */
     fun rows(
+        anchor: Anchor,
         chestCm: Double?,
         neckCm: Double?,
         armCm: Double?,
@@ -60,6 +89,7 @@ object ClassicalProportions {
         calfCm: Double?
     ): List<ProportionRow> {
         val actuals = mapOf(
+            ProportionSite.Chest to chestCm,
             ProportionSite.Neck to neckCm,
             ProportionSite.Arm to armCm,
             ProportionSite.Waist to waistCm,
@@ -68,8 +98,14 @@ object ClassicalProportions {
             ProportionSite.Calf to calfCm
         )
         return ProportionSite.entries.mapNotNull { site ->
+            // Chest is the anchor when no wrist was recorded, so comparing it
+            // against itself would always read exactly 1.00 and tell nobody
+            // anything. With a wrist it is a real comparison and worth showing.
+            if (site == ProportionSite.Chest && anchor is Anchor.FromChest) {
+                return@mapNotNull null
+            }
             val actual = actuals[site]?.takeIf { it > 0 } ?: return@mapNotNull null
-            val classic = classicFor(site, chestCm) ?: return@mapNotNull null
+            val classic = classicFor(site, anchor.chestCm) ?: return@mapNotNull null
             ProportionRow(site, actual, classic)
         }
     }

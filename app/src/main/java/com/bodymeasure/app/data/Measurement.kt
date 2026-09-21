@@ -17,6 +17,7 @@ data class Measurement(
     val hipCm: Double? = null,
     val thighCm: Double? = null,
     val calfCm: Double? = null,
+    val wristCm: Double? = null,
     val neckCm: Double? = null,
     val bmi: Double,
     val bodyFatPct: Double? = null,

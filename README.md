@@ -6,7 +6,8 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
 ## Features
 
 - Record weight & height — BMI is computed automatically.
-- Optional measurements: neck, waist, hip, chest, arm, thigh, calf (all in cm).
+- Optional measurements: neck, waist, hip, chest, arm, thigh, calf, wrist
+  (all in cm).
 - Measurement date is editable, so a session can be logged after the fact;
   history, charts and analysis all order by that date.
 - Optional progress photo attached to each entry, shown in history.
@@ -17,7 +18,8 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
   picked.
 - Live BMI / body-fat / BMR / TDEE preview card as you type.
 - **Trends tab** charting every recorded value over time — BMI, weight, body
-  fat, BMR, and each circumference (waist, chest, arm, thigh, calf, hip, neck).
+  fat, BMR, and each circumference (waist, chest, arm, thigh, calf, wrist,
+  hip, neck).
 - **Analysis tab**: lean/fat mass, FFMI, waist-to-height, waist-to-hip and
   healthy weight range, all derived from what you already entered.
 - **How-to-measure illustrations**: tap the info icon next to any measurement
@@ -193,12 +195,19 @@ Sandow and Steve Reeves. Every site is a fraction of the chest: hips 85%, waist
 70%, thigh 53%, neck 37%, arm 36%, calf 34%, with a symmetry rule holding arm,
 neck and calf at roughly equal girth.
 
-McCallum actually anchors the chest on **wrist** girth (chest = 6.5 × wrist),
-the reasoning being that wrist reflects skeletal frame and does not change with
-training. The app does not record wrist, so it anchors on the recorded chest
-instead — "given the chest you have, here is where the classical physique puts
-everything else". Adding a wrist measurement would make this the more faithful
-frame-based version.
+McCallum anchors the chest on **wrist** girth (chest = 6.5 × wrist), the
+reasoning being that wrist is almost pure bone and tendon, so it reflects
+skeletal frame and barely moves with training or weight. The app uses that form
+whenever a wrist measurement exists, and falls back to the recorded chest
+otherwise.
+
+The fallback is worth understanding, because it is not neutral. Every figure is
+a fraction of the chest, so if your chest sits below the classical one for your
+frame, *all* the targets shrink together — the waist most visibly. A 98.5 cm
+chest yields a 68.9 cm waist target (27 inches); the same person's wrist-derived
+chest of ~113 cm yields ~79 cm, which is a completely different reading of the
+same body. Record a wrist and the card switches to the frame-based version,
+which also stops the targets drifting as training changes the chest.
 
 The card carries no pass/fail colouring and no bands, unlike the health metrics
 above it. These are one subculture's aesthetic from one era: hardly anyone

@@ -236,15 +236,19 @@ fun AnalysisScreen(items: List<Measurement>) {
         }
 
         // ---- Classical proportions ----
-        val classicRows = ClassicalProportions.rows(
-            chestCm = latest.chestCm,
-            neckCm = latest.neckCm,
-            armCm = latest.armCm,
-            waistCm = latest.waistCm,
-            hipCm = latest.hipCm,
-            thighCm = latest.thighCm,
-            calfCm = latest.calfCm
-        )
+        val classicAnchor = ClassicalProportions.anchor(latest.wristCm, latest.chestCm)
+        val classicRows = classicAnchor?.let {
+            ClassicalProportions.rows(
+                anchor = it,
+                chestCm = latest.chestCm,
+                neckCm = latest.neckCm,
+                armCm = latest.armCm,
+                waistCm = latest.waistCm,
+                hipCm = latest.hipCm,
+                thighCm = latest.thighCm,
+                calfCm = latest.calfCm
+            )
+        } ?: emptyList()
         AnalysisCard(
             title = stringResource(R.string.analysis_classic),
             help = stringResource(R.string.analysis_classic_help),
@@ -252,12 +256,25 @@ fun AnalysisScreen(items: List<Measurement>) {
                 stringResource(R.string.analysis_classic_needs) else null
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                latest.chestCm?.let {
-                    Text(
-                        stringResource(R.string.analysis_classic_anchor, BodyAnalysis.format1(it)),
+                when (val a = classicAnchor) {
+                    is ClassicalProportions.Anchor.FromWrist -> Text(
+                        stringResource(
+                            R.string.analysis_classic_anchor_wrist,
+                            BodyAnalysis.format1(a.wristCm),
+                            BodyAnalysis.format1(a.chestCm)
+                        ),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    is ClassicalProportions.Anchor.FromChest -> Text(
+                        stringResource(
+                            R.string.analysis_classic_anchor_chest,
+                            BodyAnalysis.format1(a.chestCm)
+                        ),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    null -> Unit
                 }
                 classicRows.forEach { ClassicRow(it) }
 
@@ -339,6 +356,7 @@ private fun ProgressCard(items: List<Measurement>) {
         Triple("Arm", "cm", Triple(current.armCm, previous.armCm, first.armCm)),
         Triple("Thigh", "cm", Triple(current.thighCm, previous.thighCm, first.thighCm)),
         Triple("Calf", "cm", Triple(current.calfCm, previous.calfCm, first.calfCm)),
+        Triple("Wrist", "cm", Triple(current.wristCm, previous.wristCm, first.wristCm)),
         Triple("Hip", "cm", Triple(current.hipCm, previous.hipCm, first.hipCm)),
         Triple("Neck", "cm", Triple(current.neckCm, previous.neckCm, first.neckCm)),
         Triple("Body fat", "%", Triple(current.bodyFatPct, previous.bodyFatPct, first.bodyFatPct))

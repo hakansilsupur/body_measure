@@ -52,6 +52,7 @@ BICEP  = dict(y=332, cx=203, rx=26)
 THIGH  = dict(y=660, cx=255, rx=45)
 CALF   = dict(y=838, cx=227, rx=32)   # calf belly - widest point of the lower leg
 KNEE   = (231, 786)                   # narrowest point above it
+WRIST  = dict(y=522, cx=199, rx=14)   # narrowest point between forearm and hand
 NAVEL  = (316, 400)
 NIPPLES = ((277, 286), (355, 286))
 GLUTEAL_FOLD = (255, 630)
@@ -246,6 +247,13 @@ def build():
     f.callout(THIGH["cx"] + THIGH["rx"], THIGH["y"], ["tape just below it,", "around the widest part"], dy=18)
     f.caption("Weight even on both feet; tape level with the floor")
     figs["thigh"] = f
+
+    # Wrist - narrowest point above the hand
+    f = Fig(body, limb_focus(WRIST["cx"], WRIST["y"], x_bias=0.30))
+    f.add(W(WRIST))
+    f.callout(WRIST["cx"] + WRIST["rx"], WRIST["y"], ["narrowest point,", "above the hand"], dy=0)
+    f.caption("Hand relaxed and open; wrist barely changes, so it marks your frame")
+    figs["wrist"] = f
 
     # Calf - widest point of the lower leg
     f = Fig(body, limb_focus(CALF["cx"], CALF["y"], x_bias=0.28))

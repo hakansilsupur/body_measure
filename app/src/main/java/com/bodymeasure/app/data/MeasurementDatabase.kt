@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Measurement::class], version = 6, exportSchema = true)
+@Database(entities = [Measurement::class], version = 7, exportSchema = true)
 abstract class MeasurementDatabase : RoomDatabase() {
 
     abstract fun measurementDao(): MeasurementDao
