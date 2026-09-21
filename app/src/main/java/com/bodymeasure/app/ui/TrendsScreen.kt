@@ -22,6 +22,9 @@ import com.bodymeasure.app.util.Bmr
 import com.bodymeasure.app.util.BodyAnalysis
 import com.bodymeasure.app.util.BodyFat
 
+/** Matches the teal the Analysis tab uses for FFMI, so the two read as one metric. */
+private val FfmiTeal = Color(0xFF26A69A)
+
 private class ChartSpec(
     val title: String,
     val points: List<ChartPoint>,
@@ -58,6 +61,14 @@ fun TrendsScreen(items: List<Measurement>) {
         ChartSpec(stringResource(R.string.trends_bmi), pointsOf { it.bmi }, primary) { Bmi.format(it) },
         ChartSpec(stringResource(R.string.trends_weight), pointsOf { it.weightKg }, primary, kg),
         ChartSpec(stringResource(R.string.trends_body_fat), pointsOf { it.bodyFatPct }, secondary) { "${BodyFat.format(it)}%" },
+        // FFMI is derived rather than stored, so it appears for every past entry
+        // that has a body fat figure without needing a migration.
+        ChartSpec(
+            stringResource(R.string.trends_ffmi),
+            pointsOf { BodyAnalysis.normalizedFfmi(it.weightKg, it.heightCm, it.bodyFatPct) },
+            FfmiTeal,
+            BodyAnalysis::format1
+        ),
         ChartSpec(stringResource(R.string.trends_bmr), pointsOf { it.bmrKcal }, tertiary) { Bmr.format(it) },
         ChartSpec(stringResource(R.string.trends_waist), pointsOf { it.waistCm }, secondary, cm),
         ChartSpec(stringResource(R.string.trends_chest), pointsOf { it.chestCm }, tertiary, cm),

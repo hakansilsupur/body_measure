@@ -63,6 +63,7 @@
     <string name="trends_bmi">BMI over time</string>
     <string name="trends_body_fat">Body fat % over time</string>
     <string name="trends_bmr">BMR (kcal/day) over time</string>
+    <string name="trends_ffmi">FFMI over time</string>
     <string name="chart_need_two">Add at least two entries to see a chart.</string>
     <string name="chart_no_data">No data points yet.</string>
 

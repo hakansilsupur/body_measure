@@ -18,8 +18,8 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
   picked.
 - Live BMI / body-fat / BMR / TDEE preview card as you type.
 - **Trends tab** charting every recorded value over time — BMI, weight, body
-  fat, BMR, and each circumference (waist, chest, arm, thigh, calf, wrist,
-  hip, neck).
+  fat, FFMI, BMR, and each circumference (waist, chest, arm, thigh, calf,
+  wrist, hip, neck).
 - **Analysis tab**: lean/fat mass, FFMI, waist-to-height, waist-to-hip and
   healthy weight range, all derived from what you already entered.
 - **How-to-measure illustrations**: tap the info icon next to any measurement
@@ -369,20 +369,32 @@ and history entries are stored with their activity factor.
 
 ## Trends
 
-The **Trends** tab shows three line charts side by side:
+The **Trends** tab stacks one line chart per value, derived metrics first:
 
-1. BMI over time
-2. Body-fat % over time (only entries where it could be computed)
-3. BMR (kcal/day) over time
+1. BMI
+2. Weight (kg)
+3. Body-fat % (only entries where it could be computed)
+4. FFMI
+5. BMR (kcal/day)
+6. Each circumference recorded — waist, chest, arm, thigh, calf, wrist, hip, neck
+
+A chart is skipped entirely when you have never recorded that value, rather than
+showing an empty card for every field you don't track.
+
+BMI, body fat and BMR are stored columns, but FFMI is computed on the fly from
+weight, height and body fat. That means it appears across your whole history the
+moment the chart ships — no migration, no back-fill, and no stale values if the
+formula is ever corrected. It plots wherever body fat could be computed, so its
+gaps line up with the body-fat chart's.
 
 Charts are rendered with native Compose Canvas — no third-party charting
 dependency.
 
 ## How-to-measure tutorials
 
-The six tape-measurement fields (neck, waist, hip, chest, arm, thigh) on the
-Record screen each show a small ⓘ icon. Tapping it opens a dialog with a
-photo of the technique and short text instructions.
+The eight tape-measurement fields (neck, waist, hip, chest, arm, thigh, calf,
+wrist) on the Record screen each show a small ⓘ icon. Tapping it opens a dialog
+with a photo of the technique and short text instructions.
 
 ### The diagrams
 
