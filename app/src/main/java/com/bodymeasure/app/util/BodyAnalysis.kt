@@ -4,6 +4,23 @@ import kotlin.math.roundToInt
 
 enum class RiskLevel { Low, Moderate, High }
 
+/**
+ * Torso taper ratios worth showing, each with the value McCallum's classical
+ * figures imply for it.
+ *
+ * Deliberately short. Arm-to-waist and thigh-to-waist were dropped: they have
+ * no established reference to compare against, and because they share the waist
+ * denominator with chest-to-waist they simply restate it — three rows moving in
+ * lockstep read as a pattern when they are one number.
+ */
+enum class TaperRatio(val label: String, val classic: Double) {
+    /** The V-taper. Classical waist is 70% of chest, so the ratio is 1/0.70. */
+    ChestToWaist("Chest / waist", 1.0 / 0.70),
+
+    /** Classical hip is 85% of chest. */
+    ChestToHip("Chest / hip", 1.0 / 0.85)
+}
+
 enum class FfmiBand { BelowAverage, Average, AboveAverage, Athletic, Exceptional }
 
 /**
@@ -134,6 +151,19 @@ object BodyAnalysis {
         thighCm >= 60.0 -> RiskLevel.Low
         thighCm >= 50.0 -> RiskLevel.Moderate
         else -> RiskLevel.High
+    }
+
+    /** The taper ratio for [kind], or null when a needed measurement is absent. */
+    fun taper(kind: TaperRatio, chestCm: Double?, waistCm: Double?, hipCm: Double?): Double? =
+        when (kind) {
+            TaperRatio.ChestToWaist -> ratio(chestCm, waistCm)
+            TaperRatio.ChestToHip -> ratio(chestCm, hipCm)
+        }
+
+    /** Signed two-decimal change, e.g. "+0.04" / "-0.03" / "0.00". */
+    fun signed2(v: Double): String {
+        val rounded = (v * 100).roundToInt() / 100.0
+        return if (rounded > 0) "+%.2f".format(rounded) else "%.2f".format(rounded)
     }
 
     fun format1(v: Double): String = "%.1f".format((v * 10).roundToInt() / 10.0)

@@ -181,7 +181,7 @@ recorded before this feature existed get analysed too.
 | Waist in context | waist | Your waist on a scale carrying both WHO cut-points and the typical population range |
 | Healthy weight range | height | Weight span for BMI 18.5–24.9 |
 | Thigh circumference | thigh | Leg muscle as a cardiovascular marker |
-| Proportions | waist + chest/arm/thigh | Chest-to-waist, arm-to-waist, thigh-to-waist, chest-to-hip |
+| Taper | chest + waist/hip | Chest-to-waist and chest-to-hip, each against its classical figure and its change since the last entry |
 | Change over time | 2+ entries | Every measurement vs. your previous and first entry |
 | Classical proportions | chest + any circumference | Your girths against the McCallum "ideal" physique |
 
@@ -245,12 +245,24 @@ FFMI is height-normalised to 1.8 m (Kouri et al. 1995) so it compares fairly
 across body sizes. Roughly 25 for men and 19 for women sits near the documented
 drug-free ceiling.
 
-Chest, arm and thigh feed the **Proportions** card and the **Change over time**
-table, and each gets its own chart in Trends. The proportion ratios carry no
-medical thresholds — the "ideal" figures circulated in fitness writing are
-aesthetic conventions, so the app reports the numbers and leaves them
-uncoloured. The exception is absolute thigh circumference, which has an actual
-cohort study behind it and is labelled with its source and its limits.
+Chest, arm and thigh feed the **Change over time** table and each gets its own
+chart in Trends. Chest, waist and hip additionally feed the **Taper** card.
+
+The taper ratios carry no medical thresholds — the "ideal" figures circulated in
+fitness writing are aesthetic conventions — so the card never marks a value pass
+or fail. It gives each ratio three things instead of a bare number: the value,
+the classical figure beside it, and the signed change since the previous entry.
+Only the change is coloured, and it is coloured by whether the ratio moved
+*toward* the classical figure rather than by its sign, since someone already
+past that figure who goes further past it is moving away from the reference.
+
+Arm-to-waist and thigh-to-waist were deliberately removed from this card. They
+have no established reference to compare against, and because they share the
+waist denominator with chest-to-waist they simply restate it — three rows moving
+in lockstep read as three findings when they are one.
+
+The exception to all of this is absolute thigh circumference, which has an
+actual cohort study behind it and is labelled with its source and its limits.
 
 ## Measurement dates
 

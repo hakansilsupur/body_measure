@@ -39,6 +39,7 @@ import com.bodymeasure.app.util.ProportionRow
 import com.bodymeasure.app.util.FfmiBand
 import com.bodymeasure.app.util.RiskLevel
 import com.bodymeasure.app.util.Sex
+import com.bodymeasure.app.util.TaperRatio
 import com.bodymeasure.app.util.WaistReference
 import com.bodymeasure.app.util.WaistRisk
 import java.text.DateFormat
@@ -68,6 +69,12 @@ fun AnalysisScreen(items: List<Measurement>) {
 
     val sex = runCatching { Sex.valueOf(latest.sex) }.getOrDefault(Sex.Male)
     val df = remember { DateFormat.getDateInstance(DateFormat.MEDIUM) }
+
+    // The entry before the latest one, used to show direction rather than a
+    // bare number. Null on the very first entry.
+    val previous = remember(items) {
+        items.sortedBy { it.timestamp }.let { it.getOrNull(it.size - 2) }
+    }
 
     val leanMass = BodyAnalysis.leanMassKg(latest.weightKg, latest.bodyFatPct)
     val fatMass = BodyAnalysis.fatMassKg(latest.weightKg, latest.bodyFatPct)
@@ -271,23 +278,38 @@ fun AnalysisScreen(items: List<Measurement>) {
             }
         }
 
-        // ---- Proportions (uses chest, arm, thigh) ----
-        val chestWaist = BodyAnalysis.ratio(latest.chestCm, latest.waistCm)
-        val armWaist = BodyAnalysis.ratio(latest.armCm, latest.waistCm)
-        val thighWaist = BodyAnalysis.ratio(latest.thighCm, latest.waistCm)
-        val chestHip = BodyAnalysis.ratio(latest.chestCm, latest.hipCm)
-        val anyProportion = listOfNotNull(chestWaist, armWaist, thighWaist, chestHip).isNotEmpty()
+        // ---- Taper (chest against waist and hip) ----
+        // Each row carries its own reference and its own direction, so a bare
+        // ratio never has to be interpreted in a vacuum.
+        val taperRows = TaperRatio.entries.mapNotNull { kind ->
+            val now = BodyAnalysis.taper(kind, latest.chestCm, latest.waistCm, latest.hipCm)
+                ?: return@mapNotNull null
+            val before = previous?.let {
+                BodyAnalysis.taper(kind, it.chestCm, it.waistCm, it.hipCm)
+            }
+            Triple(kind, now, before)
+        }
 
         AnalysisCard(
             title = stringResource(R.string.analysis_proportions),
             help = stringResource(R.string.analysis_proportions_help),
-            missing = if (!anyProportion) "waist plus chest, arm or thigh" else null
+            missing = if (taperRows.isEmpty())
+                stringResource(R.string.analysis_proportions_needs) else null
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                RatioRow(stringResource(R.string.analysis_chest_waist), chestWaist)
-                RatioRow(stringResource(R.string.analysis_arm_waist), armWaist)
-                RatioRow(stringResource(R.string.analysis_thigh_waist), thighWaist)
-                RatioRow(stringResource(R.string.analysis_chest_hip), chestHip)
+            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                taperRows.forEach { (kind, now, before) ->
+                    TaperRow(
+                        kind = kind,
+                        value = now,
+                        previous = before,
+                        previousDate = previous?.let { df.format(Date(it.timestamp)) }
+                    )
+                }
+                Text(
+                    stringResource(R.string.analysis_classic_marker),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
             }
         }
 
@@ -365,20 +387,64 @@ fun AnalysisScreen(items: List<Measurement>) {
     }
 }
 
+/**
+ * One taper ratio: the value, the classical figure beside it, the same bar the
+ * classical card uses, and the change since the previous entry.
+ *
+ * The change is coloured by whether it moved *toward* the classical figure, not
+ * by its sign. Someone already past the classical taper who goes further past it
+ * is moving away from the reference, and colouring that green would be wrong.
+ */
 @Composable
-private fun RatioRow(label: String, value: Double?) {
-    if (value == null) return
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(label, style = MaterialTheme.typography.bodyMedium)
-        Text(
-            BodyAnalysis.format2(value),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary
-        )
+private fun TaperRow(
+    kind: TaperRatio,
+    value: Double,
+    previous: Double?,
+    previousDate: String?
+) {
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(kind.label, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                stringResource(
+                    R.string.analysis_taper_value,
+                    BodyAnalysis.format2(value),
+                    BodyAnalysis.format2(kind.classic)
+                ),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Spacer(Modifier.height(4.dp))
+        ProportionBar(value / kind.classic)
+        Spacer(Modifier.height(4.dp))
+        if (previous != null && previousDate != null) {
+            val change = value - previous
+            val closer = abs(value - kind.classic) < abs(previous - kind.classic)
+            Text(
+                stringResource(
+                    R.string.analysis_taper_change,
+                    BodyAnalysis.signed2(change),
+                    previousDate
+                ),
+                style = MaterialTheme.typography.labelSmall,
+                color = when {
+                    abs(change) < 0.005 -> MaterialTheme.colorScheme.outline
+                    closer -> Good
+                    else -> Warn
+                }
+            )
+        } else {
+            Text(
+                stringResource(R.string.analysis_taper_single),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.outline
+            )
+        }
     }
 }
 
