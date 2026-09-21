@@ -178,6 +178,7 @@ recorded before this feature existed get analysed too.
 | FFMI | body-fat inputs | Lean mass scaled to height, comparable across body sizes |
 | Waist-to-height | waist, height | Central-fat risk; better predictor than BMI |
 | Waist-to-hip | waist, hip | Where fat sits, against WHO thresholds |
+| Waist in context | waist | Your waist on a scale carrying both WHO cut-points and the typical population range |
 | Healthy weight range | height | Weight span for BMI 18.5–24.9 |
 | Thigh circumference | thigh | Leg muscle as a cardiovascular marker |
 | Proportions | waist + chest/arm/thigh | Chest-to-waist, arm-to-waist, thigh-to-waist, chest-to-hip |
@@ -186,6 +187,23 @@ recorded before this feature existed get analysed too.
 
 Each card names what is missing when it cannot be computed, rather than showing
 a blank, so it is clear which measurement unlocks it.
+
+### On average vs healthy
+
+The **Waist in context** card draws one 60–130 cm scale carrying two different
+kinds of reference, because confusing them is easy and consequential:
+
+- **WHO cut-points** are health thresholds — 94 / 102 cm for men, 80 / 88 cm
+  for women — shown as the green / amber / red zones of the track.
+- **The typical adult range** is what people actually measure in national
+  surveys (roughly 95–102 cm for men, 89–98 for women, varying by country),
+  bracketed above the track.
+
+Drawing both on one axis makes the important point visible rather than stated:
+in most surveyed populations the typical range already reaches or passes the
+increased-risk line. Being at or below average therefore says very little about
+health, and the card says so outright. The thresholds are the reference; the
+average is only there to give the number scale.
 
 ### On the "ideal" proportions
 

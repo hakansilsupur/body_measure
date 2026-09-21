@@ -96,6 +96,13 @@
     <string name="analysis_whr">Waist-to-hip</string>
     <string name="analysis_whr_help">Waist divided by hips, using WHO thresholds. Reflects where fat is stored — around the middle carries more risk than around the hips.</string>
 
+    <string name="analysis_waist_context">Waist in context</string>
+    <string name="analysis_waist_context_help">Waist circumference on its own, against the two reference points that matter. The WHO cut-points are health thresholds for fat carried around the organs. The typical range is what adults actually measure in national surveys, which varies by country — it is shown to give the number scale, not as something to aim at.</string>
+    <string name="analysis_waist_who">WHO: under %1$s cm low risk · %1$s–%2$s increased · over %2$s high</string>
+    <string name="analysis_waist_typical">Typical adult range %1$s–%2$s cm</string>
+    <string name="analysis_waist_average_note">The typical range already reaches the increased-risk line, so being near or below average is not the same as being in the clear. The thresholds are the health reference; the average is only context.</string>
+    <string name="analysis_waist_you">you</string>
+
     <string name="analysis_healthy_weight">Healthy weight range</string>
     <string name="analysis_healthy_weight_help">The weight span matching BMI 18.5–24.9 at your height. BMI ignores build and muscle, so treat this as a rough guide.</string>
     <string name="analysis_within_range">You\'re within this range</string>

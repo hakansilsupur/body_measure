@@ -39,6 +39,8 @@ import com.bodymeasure.app.util.ProportionRow
 import com.bodymeasure.app.util.FfmiBand
 import com.bodymeasure.app.util.RiskLevel
 import com.bodymeasure.app.util.Sex
+import com.bodymeasure.app.util.WaistReference
+import com.bodymeasure.app.util.WaistRisk
 import java.text.DateFormat
 import java.util.Date
 import kotlin.math.abs
@@ -172,6 +174,60 @@ fun AnalysisScreen(items: List<Measurement>) {
                     caption = riskLabel(whrRisk),
                     color = riskColor(whrRisk)
                 )
+            }
+        }
+
+        // ---- Waist against health thresholds and the population ----
+        val waist = latest.waistCm?.takeIf { it > 0 }
+        val waistRisk = waist?.let { WaistReference.risk(sex, it) }
+        AnalysisCard(
+            title = stringResource(R.string.analysis_waist_context),
+            help = stringResource(R.string.analysis_waist_context_help),
+            missing = if (waist == null) "waist" else null
+        ) {
+            if (waist != null && waistRisk != null) {
+                val riskColour = when (waistRisk) {
+                    WaistRisk.Low -> Good
+                    WaistRisk.Increased -> Warn
+                    WaistRisk.High -> Bad
+                }
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    BigValue(
+                        value = "${BodyAnalysis.format1(waist)} cm",
+                        caption = when (waistRisk) {
+                            WaistRisk.Low -> stringResource(R.string.risk_low)
+                            WaistRisk.Increased -> stringResource(R.string.risk_moderate)
+                            WaistRisk.High -> stringResource(R.string.risk_high)
+                        },
+                        color = riskColour
+                    )
+                    WaistScale(sex = sex, waistCm = waist)
+                    Text(
+                        stringResource(
+                            R.string.analysis_waist_who,
+                            BodyAnalysis.format1(WaistReference.increasedAt(sex)),
+                            BodyAnalysis.format1(WaistReference.highAt(sex))
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    val (lo, hi) = WaistReference.typicalRange(sex)
+                    Text(
+                        stringResource(
+                            R.string.analysis_waist_typical,
+                            BodyAnalysis.format1(lo), BodyAnalysis.format1(hi)
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (WaistReference.typicalIsAboveThreshold(sex)) {
+                        Text(
+                            stringResource(R.string.analysis_waist_average_note),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
         }
 
@@ -481,6 +537,69 @@ private fun ProportionBar(ratio: Double) {
         Box(
             Modifier.fillMaxHeight().width(2.dp).offset(x = full * markerAt).background(tick)
         )
+    }
+}
+
+
+/**
+ * Waist on a fixed 60-130 cm scale: WHO risk zones as the track, the typical
+ * population band bracketed above it, and the user's own value marked. Drawing
+ * both on one axis is the point — it shows where "average" actually falls
+ * relative to the health thresholds.
+ */
+@Composable
+private fun WaistScale(sex: Sex, waistCm: Double) {
+    val increased = WaistReference.increasedAt(sex)
+    val high = WaistReference.highAt(sex)
+    val (typLo, typHi) = WaistReference.typicalRange(sex)
+
+    val pIncreased = WaistReference.scalePosition(increased)
+    val pHigh = WaistReference.scalePosition(high)
+    val pYou = WaistReference.scalePosition(waistCm)
+    val pTypLo = WaistReference.scalePosition(typLo)
+    val pTypHi = WaistReference.scalePosition(typHi)
+
+    val onSurf = MaterialTheme.colorScheme.onSurface
+    val muted = MaterialTheme.colorScheme.onSurfaceVariant
+
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val full = maxWidth
+        Column {
+            // Typical-population bracket, sitting above the risk track.
+            Box(modifier = Modifier.fillMaxWidth().height(14.dp)) {
+                Box(
+                    Modifier
+                        .offset(x = full * pTypLo)
+                        .width(full * (pTypHi - pTypLo))
+                        .height(6.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(muted.copy(alpha = 0.55f))
+                )
+            }
+            // WHO risk zones.
+            Box(modifier = Modifier.fillMaxWidth().height(14.dp)) {
+                Row(Modifier.fillMaxSize().clip(RoundedCornerShape(7.dp))) {
+                    Box(Modifier.fillMaxHeight().weight(pIncreased).background(Good))
+                    Box(Modifier.fillMaxHeight().weight(pHigh - pIncreased).background(Warn))
+                    Box(Modifier.fillMaxHeight().weight(1f - pHigh).background(Bad))
+                }
+                // The user's own waist.
+                Box(
+                    Modifier
+                        .offset(x = full * pYou - 1.5.dp)
+                        .width(3.dp)
+                        .fillMaxHeight()
+                        .background(onSurf)
+                )
+            }
+            Spacer(Modifier.height(2.dp))
+            Text(
+                stringResource(R.string.analysis_waist_you),
+                style = MaterialTheme.typography.labelSmall,
+                color = onSurf,
+                modifier = Modifier.offset(x = (full * pYou - 10.dp).coerceAtLeast(0.dp))
+            )
+        }
     }
 }
 
