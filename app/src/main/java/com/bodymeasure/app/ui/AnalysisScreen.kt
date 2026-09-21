@@ -1,14 +1,20 @@
 package com.bodymeasure.app.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -20,12 +26,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bodymeasure.app.R
 import com.bodymeasure.app.data.Measurement
 import com.bodymeasure.app.util.BodyAnalysis
+import com.bodymeasure.app.util.ClassicalProportions
+import com.bodymeasure.app.util.ProportionRow
 import com.bodymeasure.app.util.FfmiBand
 import com.bodymeasure.app.util.RiskLevel
 import com.bodymeasure.app.util.Sex
@@ -225,6 +234,51 @@ fun AnalysisScreen(items: List<Measurement>) {
             }
         }
 
+        // ---- Classical proportions ----
+        val classicRows = ClassicalProportions.rows(
+            chestCm = latest.chestCm,
+            neckCm = latest.neckCm,
+            armCm = latest.armCm,
+            waistCm = latest.waistCm,
+            hipCm = latest.hipCm,
+            thighCm = latest.thighCm,
+            calfCm = latest.calfCm
+        )
+        AnalysisCard(
+            title = stringResource(R.string.analysis_classic),
+            help = stringResource(R.string.analysis_classic_help),
+            missing = if (classicRows.isEmpty())
+                stringResource(R.string.analysis_classic_needs) else null
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                latest.chestCm?.let {
+                    Text(
+                        stringResource(R.string.analysis_classic_anchor, BodyAnalysis.format1(it)),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                classicRows.forEach { ClassicRow(it) }
+
+                Text(
+                    stringResource(R.string.analysis_classic_marker),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                ClassicalProportions.symmetrySpreadCm(
+                    latest.neckCm, latest.armCm, latest.calfCm
+                )?.let { spread ->
+                    Text(
+                        stringResource(
+                            R.string.analysis_classic_symmetry, BodyAnalysis.format1(spread)
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+
         // ---- Change over time ----
         ProgressCard(items = items)
 
@@ -356,6 +410,59 @@ private fun DeltaText(current: Double?, baseline: Double?, unit: String, modifie
         color = MaterialTheme.colorScheme.onSurface,
         modifier = modifier
     )
+}
+
+
+/**
+ * One site against its classical figure. The bar is deliberately a single
+ * neutral colour with no good/bad banding — these proportions are an aesthetic
+ * convention, and colouring them would dress an opinion up as a verdict.
+ */
+@Composable
+private fun ClassicRow(row: ProportionRow) {
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(row.site.label, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                "${BodyAnalysis.format1(row.actualCm)} cm  ·  classic " +
+                    "${BodyAnalysis.format1(row.classicCm)} cm",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Spacer(Modifier.height(4.dp))
+        ProportionBar(row.ratio)
+    }
+}
+
+@Composable
+private fun ProportionBar(ratio: Double) {
+    // The scale runs to 1.5x the classical figure, so the tick sits two thirds
+    // along and there is room to show overshoot without the bar pinning.
+    val maxRatio = 1.5
+    val fill = (ratio / maxRatio).coerceIn(0.02, 1.0).toFloat()
+    val markerAt = (1.0 / maxRatio).toFloat()
+    val track = MaterialTheme.colorScheme.surface
+    val bar = MaterialTheme.colorScheme.primary
+    val tick = MaterialTheme.colorScheme.onSurfaceVariant
+
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth().height(12.dp)) {
+        val full = maxWidth
+        Box(
+            Modifier.fillMaxSize().clip(RoundedCornerShape(6.dp)).background(track)
+        )
+        Box(
+            Modifier.fillMaxHeight().fillMaxWidth(fill)
+                .clip(RoundedCornerShape(6.dp)).background(bar)
+        )
+        Box(
+            Modifier.fillMaxHeight().width(2.dp).offset(x = full * markerAt).background(tick)
+        )
+    }
 }
 
 @Composable

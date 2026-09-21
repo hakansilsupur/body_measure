@@ -112,6 +112,13 @@
     <string name="analysis_thigh_waist">Thigh / waist</string>
     <string name="analysis_chest_hip">Chest / hip</string>
 
+    <string name="analysis_classic">Classical proportions</string>
+    <string name="analysis_classic_help">These ratios come from mid-20th-century bodybuilding — John McCallum\'s figures, rooted in the physiques of Sandow and Steve Reeves. They are one era\'s aesthetic convention, not a health standard: hardly anyone matches the full set, the waist figure is far narrower than most people carry, and none of it says anything about how healthy or strong you are. Shown as a reference to compare against, not a target to hit — which is why nothing here is marked pass or fail.</string>
+    <string name="analysis_classic_anchor">Scaled to your chest of %1$s cm. McCallum anchors chest on wrist girth; the app has no wrist measurement, so your chest is used instead.</string>
+    <string name="analysis_classic_symmetry">Classical symmetry also holds arm, neck and calf at about the same girth. Yours span %1$s cm.</string>
+    <string name="analysis_classic_needs">chest, plus any of neck, arm, waist, hip, thigh or calf</string>
+    <string name="analysis_classic_marker">The tick marks the classical figure</string>
+
     <string name="analysis_thigh_size">Thigh circumference</string>
     <string name="analysis_thigh_help">A large Danish cohort study linked thigh circumference under about 60 cm to higher cardiovascular risk, independent of body fat — muscle in the legs appears protective. It is one study on one population, so read it as context, not a verdict.</string>
 

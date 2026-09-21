@@ -180,9 +180,31 @@ recorded before this feature existed get analysed too.
 | Thigh circumference | thigh | Leg muscle as a cardiovascular marker |
 | Proportions | waist + chest/arm/thigh | Chest-to-waist, arm-to-waist, thigh-to-waist, chest-to-hip |
 | Change over time | 2+ entries | Every measurement vs. your previous and first entry |
+| Classical proportions | chest + any circumference | Your girths against the McCallum "ideal" physique |
 
 Each card names what is missing when it cannot be computed, rather than showing
 a blank, so it is clear which measurement unlocks it.
+
+### On the "ideal" proportions
+
+The **Classical proportions** card compares each girth against John McCallum's
+figures (*Keys to Progress*, 1960s), which descend from the physiques of Eugen
+Sandow and Steve Reeves. Every site is a fraction of the chest: hips 85%, waist
+70%, thigh 53%, neck 37%, arm 36%, calf 34%, with a symmetry rule holding arm,
+neck and calf at roughly equal girth.
+
+McCallum actually anchors the chest on **wrist** girth (chest = 6.5 × wrist),
+the reasoning being that wrist reflects skeletal frame and does not change with
+training. The app does not record wrist, so it anchors on the recorded chest
+instead — "given the chest you have, here is where the classical physique puts
+everything else". Adding a wrist measurement would make this the more faithful
+frame-based version.
+
+The card carries no pass/fail colouring and no bands, unlike the health metrics
+above it. These are one subculture's aesthetic from one era: hardly anyone
+matches the full set, the waist figure is far narrower than most people carry,
+and none of it indicates health or strength. It is drawn as a reference to
+compare against, not a target, and the app says so on the card itself.
 
 ### On "muscle ratio"
 
