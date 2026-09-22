@@ -227,11 +227,33 @@ chest of ~113 cm yields ~79 cm, which is a completely different reading of the
 same body. Record a wrist and the card switches to the frame-based version,
 which also stops the targets drifting as training changes the chest.
 
-The card carries no pass/fail colouring and no bands, unlike the health metrics
-above it. These are one subculture's aesthetic from one era: hardly anyone
-matches the full set, the waist figure is far narrower than most people carry,
-and none of it indicates health or strength. It is drawn as a reference to
-compare against, not a target, and the app says so on the card itself.
+Wrist anchoring has its own limit, and the card now states it. McCallum wrote
+that 6.5× coefficient for the trainees in front of him, whose wrists ran roughly
+6.5–7.5 in (16.5–19 cm). It is a single linear factor with no claim to hold
+outside that span, so when a recorded wrist falls below 16.5 or above 19 cm the
+card says plainly that the figures are extrapolated.
+
+That warning is not pedantry. Because the chest the wrist produces is the
+denominator for every other site, a wrist outside the span does not skew one
+row — it moves all seven the same way at once, and seven bars agreeing reads as
+a finding about the body when it is an artifact of the anchor. A 14 cm wrist
+implies a 91 cm chest and so a 63.7 cm waist target (25 inches), which almost
+nobody clears; the same body at a 17 cm wrist gets a 77.3 cm target and flips
+most rows from over to under. Without the warning the first version looks like a
+verdict.
+
+Beyond that, **classical is not average, and the two are easy to confuse.** The
+classical waist figure is far below any population figure — the Waist in context
+card puts typical adult men at 95–102 cm against a classical target in the 60s
+or 70s. A waist can sit well above the classical figure and well below average
+at the same time, and usually does. The classical card measures distance from an
+aesthetic ideal, nothing more.
+
+So the card carries no pass/fail colouring and no bands, unlike the health
+metrics above it. These are one subculture's aesthetic from one era: hardly
+anyone matches the full set, and none of it indicates health or strength. It is
+drawn as a reference to compare against, not a target, and the app says so on
+the card itself.
 
 ### On "muscle ratio"
 

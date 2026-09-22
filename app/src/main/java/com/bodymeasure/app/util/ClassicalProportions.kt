@@ -44,10 +44,33 @@ data class ProportionRow(
     val ratio: Double get() = if (classicCm > 0) actualCm / classicCm else 0.0
 }
 
+/** Where a wrist sits relative to the span McCallum's rule was written for. */
+enum class AnchorRange { Below, Calibrated, Above }
+
 object ClassicalProportions {
 
     /** McCallum derives the classical chest from wrist girth. */
     const val CHEST_PER_WRIST = 6.5
+
+    /**
+     * McCallum wrote the 6.5x rule for the trainees in front of him, whose
+     * wrists ran roughly 6.5-7.5 in. It is a single linear coefficient with no
+     * claim to hold outside that span.
+     *
+     * This matters more here than a normal extrapolation would, because the
+     * chest it produces is the denominator for every other site. One wrist
+     * outside the span does not skew one row, it moves all seven the same way
+     * at once — and seven bars agreeing looks like a finding about the body
+     * rather than an artifact of the anchor. So the card says so outright.
+     */
+    const val WRIST_CALIBRATED_MIN_CM = 16.5
+    const val WRIST_CALIBRATED_MAX_CM = 19.0
+
+    fun wristRange(wristCm: Double): AnchorRange = when {
+        wristCm < WRIST_CALIBRATED_MIN_CM -> AnchorRange.Below
+        wristCm > WRIST_CALIBRATED_MAX_CM -> AnchorRange.Above
+        else -> AnchorRange.Calibrated
+    }
 
     /** Where the ratios are being scaled from, and which measurement supplied it. */
     sealed interface Anchor {

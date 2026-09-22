@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bodymeasure.app.R
 import com.bodymeasure.app.data.Measurement
+import com.bodymeasure.app.util.AnchorRange
 import com.bodymeasure.app.util.BodyAnalysis
 import com.bodymeasure.app.util.ClassicalProportions
 import com.bodymeasure.app.util.ProportionRow
@@ -335,15 +336,32 @@ fun AnalysisScreen(items: List<Measurement>) {
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 when (val a = classicAnchor) {
-                    is ClassicalProportions.Anchor.FromWrist -> Text(
-                        stringResource(
-                            R.string.analysis_classic_anchor_wrist,
-                            BodyAnalysis.format1(a.wristCm),
-                            BodyAnalysis.format1(a.chestCm)
-                        ),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    is ClassicalProportions.Anchor.FromWrist -> {
+                        Text(
+                            stringResource(
+                                R.string.analysis_classic_anchor_wrist,
+                                BodyAnalysis.format1(a.wristCm),
+                                BodyAnalysis.format1(a.chestCm)
+                            ),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        // A wrist outside McCallum's span moves every row the same
+                        // way at once, so say so before the rows rather than let
+                        // seven agreeing bars read as a verdict.
+                        val warning = when (ClassicalProportions.wristRange(a.wristCm)) {
+                            AnchorRange.Below -> R.string.analysis_classic_wrist_low
+                            AnchorRange.Above -> R.string.analysis_classic_wrist_high
+                            AnchorRange.Calibrated -> null
+                        }
+                        if (warning != null) {
+                            Text(
+                                stringResource(warning, BodyAnalysis.format1(a.wristCm)),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Warn
+                            )
+                        }
+                    }
                     is ClassicalProportions.Anchor.FromChest -> Text(
                         stringResource(
                             R.string.analysis_classic_anchor_chest,
