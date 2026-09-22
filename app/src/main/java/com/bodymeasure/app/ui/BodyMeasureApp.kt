@@ -1,5 +1,6 @@
 package com.bodymeasure.app.ui
 
+import android.content.ActivityNotFoundException
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -12,9 +13,11 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.ShowChart
+import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,11 +41,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.bodymeasure.app.BuildConfig
 import com.bodymeasure.app.R
 import com.bodymeasure.app.data.MeasurementBackup
 import com.bodymeasure.app.ui.theme.BodyMeasureTheme
+import com.bodymeasure.app.update.ReleaseInfo
+import com.bodymeasure.app.update.UpdateInstaller
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -55,6 +63,7 @@ fun BodyMeasureApp() {
     BodyMeasureTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             val vm: MeasurementViewModel = viewModel()
+            val updateVm: UpdateViewModel = viewModel()
             var tab by rememberSaveable { mutableStateOf(Tab.Add) }
             val stateHolder = rememberSaveableStateHolder()
             val snackbarHostState = remember { SnackbarHostState() }
@@ -101,6 +110,51 @@ fun BodyMeasureApp() {
                 ActivityResultContracts.OpenDocument()
             ) { uri -> uri?.let { vm.importFrom(it, onTransferResult) } }
 
+            // ---- Updates ----
+            val context = LocalContext.current
+            val installUnavailable = stringResource(R.string.update_install_unavailable)
+
+            // The permission screen returns no result, so re-check on the way
+            // back rather than trusting that the user granted anything.
+            var permissionTarget by remember { mutableStateOf<ReleaseInfo?>(null) }
+            val settingsLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) { permissionTarget?.let { updateVm.retryInstall(it) } }
+
+            LaunchedEffect(Unit) { updateVm.checkOnLaunch() }
+
+            updateVm.message?.let { text ->
+                LaunchedEffect(text) {
+                    showMessage(text)
+                    updateVm.consumeMessage()
+                }
+            }
+
+            updateVm.installRequest?.let { apk ->
+                LaunchedEffect(apk) {
+                    // Package-visibility filtering on API 30+ can hide the
+                    // installer from resolveActivity even when it is there, so
+                    // launch and catch rather than ask first.
+                    try {
+                        context.startActivity(UpdateInstaller.installIntent(context, apk))
+                    } catch (e: ActivityNotFoundException) {
+                        showMessage(installUnavailable)
+                    }
+                    updateVm.consumeInstallRequest()
+                }
+            }
+
+            UpdateDialog(
+                state = updateVm.state,
+                onDownload = updateVm::download,
+                onSkip = updateVm::skip,
+                onGrantPermission = { release ->
+                    permissionTarget = release
+                    settingsLauncher.launch(UpdateInstaller.unknownSourcesIntent(context))
+                },
+                onDismiss = updateVm::dismiss
+            )
+
             Scaffold(
                 topBar = {
                     TopAppBar(
@@ -118,7 +172,8 @@ fun BodyMeasureApp() {
                                     importLauncher.launch(
                                         arrayOf(MeasurementBackup.MIME_TYPE, "application/octet-stream", "text/plain")
                                     )
-                                }
+                                },
+                                onCheckUpdates = updateVm::checkNow
                             )
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
@@ -208,7 +263,11 @@ fun BodyMeasureApp() {
 }
 
 @Composable
-private fun DataMenu(onExport: () -> Unit, onImport: () -> Unit) {
+private fun DataMenu(
+    onExport: () -> Unit,
+    onImport: () -> Unit,
+    onCheckUpdates: () -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
     IconButton(onClick = { expanded = true }) {
         Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options))
@@ -223,6 +282,25 @@ private fun DataMenu(onExport: () -> Unit, onImport: () -> Unit) {
             text = { Text(stringResource(R.string.import_data)) },
             leadingIcon = { Icon(Icons.Default.Download, contentDescription = null) },
             onClick = { expanded = false; onImport() }
+        )
+        HorizontalDivider()
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.update_check)) },
+            leadingIcon = { Icon(Icons.Default.SystemUpdate, contentDescription = null) },
+            onClick = { expanded = false; onCheckUpdates() }
+        )
+        // The running version, so a bug report can name it without digging
+        // through Android's app info screen.
+        DropdownMenuItem(
+            text = {
+                Text(
+                    "v${BuildConfig.VERSION_NAME}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            enabled = false,
+            onClick = {}
         )
     }
 }

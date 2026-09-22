@@ -163,6 +163,25 @@
     <string name="photo_attach_failed">Couldn\'t attach that image</string>
 
     <string name="more_options">More options</string>
+
+    <string name="update_check">Check for updates</string>
+    <string name="update_checking">Checking for updates…</string>
+    <string name="update_available_title">Version %1$s is available</string>
+    <string name="update_from_to">You have %1$s. Updating to %2$s.</string>
+    <string name="update_size">Download size: %1$s MB</string>
+    <string name="update_install_note">Your recorded history is kept — this installs over the current app rather than replacing it. Android will ask you to confirm the install; that confirmation cannot be skipped.</string>
+    <string name="update_download_install">Download and install</string>
+    <string name="update_later">Later</string>
+    <string name="update_skip">Skip this version</string>
+    <string name="update_downloading">Downloading %1$s…</string>
+    <string name="update_up_to_date">You\'re on the latest version (%1$s)</string>
+    <string name="update_check_failed">Couldn\'t reach GitHub to check for updates</string>
+    <string name="update_download_failed">The download didn\'t finish. Check your connection and try again.</string>
+    <string name="update_failed_title">Update failed</string>
+    <string name="update_permission_title">Allow installing updates</string>
+    <string name="update_permission_text">Android only lets an app install another app once you allow it in Settings. Turn on \"Allow from this source\" for Body Measure, then come back — the download is already saved and will carry on.</string>
+    <string name="update_open_settings">Open settings</string>
+    <string name="update_install_unavailable">No installer available on this device</string>
     <string name="export_data">Export data</string>
     <string name="import_data">Import data</string>
     <string name="export_empty">Nothing to export yet</string>

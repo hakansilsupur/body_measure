@@ -22,6 +22,8 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
   wrist, hip, neck).
 - **Analysis tab**: lean/fat mass, FFMI, waist-to-height, waist-to-hip and
   healthy weight range, all derived from what you already entered.
+- **In-app updates** — checks GitHub Releases on launch and on demand, then
+  downloads and hands the APK to the system installer on request.
 - **How-to-measure illustrations**: tap the info icon next to any measurement
   field to see a small diagram and instructions for proper tape placement.
 - History of all entries, newest first: collapsed cards showing date, BMI,
@@ -81,6 +83,81 @@ on every push and uploads it as an artifact.
    the APK (file manager / browser), then tap the APK to install.
 
 The APK is a debug build — fine for personal use, not for the Play Store.
+
+## In-app updates
+
+Once a version is installed, the app looks after upgrades itself. It checks
+GitHub Releases at most once every six hours on launch, and on demand from
+**⋮ → Check for updates**. When a newer version exists it offers **Download and
+install**, **Later**, or **Skip this version** (which suppresses that one
+version, not every later one). The running version is shown at the bottom of the
+same menu.
+
+Deliberate manners: the launch check is silent both when the app is current and
+when the network is down. An app that opens with "couldn't check for updates"
+every time you're on a train is worse than one that says nothing. The menu check
+reports every outcome, because you just asked it to look.
+
+**It cannot update silently, and nothing here pretends otherwise.** Installing a
+package is privileged, and Android reserves it for the system installer unless
+the app is a device owner or a privileged system app. So the flow is: one tap to
+download, then the system's own install dialog, which you confirm. The app also
+needs "Allow from this source" turned on for itself once, in Settings — there is
+no runtime prompt for that permission, so the app detects the case and sends you
+to the right screen with the download already saved.
+
+### How the pieces fit
+
+| Piece | Role |
+|---|---|
+| `.github/workflows/release.yml` | Builds the APK and attaches it to a GitHub Release |
+| `update/UpdateSource.kt` | Reads `releases/latest`, downloads the asset |
+| `update/AppVersion.kt` | Parses and compares version strings |
+| `update/UpdateInstaller.kt` | Hands the APK to the system installer |
+| `update/UpdatePrefs.kt` | Last-check time and skipped version |
+| `ui/UpdateViewModel.kt` | State machine; silent vs. manual checks |
+| `ui/UpdateDialog.kt` | The prompt, in its four shapes |
+
+Releases, not CI artifacts, because downloading a workflow artifact needs an
+authenticated GitHub token — the app would have to ship a credential. Release
+assets on a public repo are anonymous HTTPS.
+
+The release APK is built with `assembleDebug`, which looks wrong and is not.
+Every installed copy is signed with the checked-in debug key, and Android
+refuses to update in place across a signature change; a release-signed APK would
+force an uninstall and take the user's history with it.
+
+### Cutting a release
+
+```bash
+# 1. bump appVersionName in app/build.gradle.kts, commit
+# 2. tag it and push
+git tag v1.3.0 && git push origin v1.3.0
+```
+
+`versionCode` is derived from `versionName` in the build script, and the release
+workflow refuses to publish when the tag and `appVersionName` disagree. Both
+guards protect the same failure: the updater compares the running `versionName`
+against the release tag, so if those can drift, an update installs successfully
+and then announces itself as available forever.
+
+### What protects the download
+
+Every hop is required to stay on HTTPS — the redirect chain is followed by hand
+for exactly that reason, rather than pinning GitHub's asset CDN hostname, which
+they have changed more than once. The APK streams to a `.part` file and is
+renamed only after the byte count matches `Content-Length`, so a truncated
+download is never handed to the installer. The asset filename is sanitised
+before it becomes a path.
+
+**The signature check is weaker here than it would normally be**, and it is
+worth stating plainly: Android will refuse an APK signed with a different key,
+which is usually a strong guarantee — but this project's signing key is the
+committed debug keystore, which is public. Anyone could sign an APK that the
+platform would accept as an in-place update. What you are actually trusting is
+the GitHub repository and the TLS connection to it, which is the same trust you
+already place in it by installing from there at all. A project distributing to
+people other than its own author should use a real, secret release key.
 
 ## Data persistence across app updates
 

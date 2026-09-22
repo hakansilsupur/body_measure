@@ -2,4 +2,7 @@
 <paths>
     <!-- Lets the camera app write a capture straight into PhotoStore's directory. -->
     <files-path name="photos" path="photos/" />
+    <!-- Lets the system package installer read a downloaded update. Cache, so
+         the OS can reclaim an APK we forgot to clean up. -->
+    <cache-path name="updates" path="updates/" />
 </paths>

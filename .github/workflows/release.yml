@@ -1,0 +1,110 @@
+name: Release
+
+# Publishes the APK as a GitHub Release asset, which is what the in-app updater
+# reads. CI build artifacts cannot serve that purpose: downloading one needs an
+# authenticated token, so the app would have to ship a credential. Release
+# assets on a public repo are plain anonymous HTTPS.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Release notes are generated from the commits since the last tag.
+          fetch-depth: 0
+
+      # The updater compares the running versionName against the release tag,
+      # so a tag that disagrees with the build would install and then keep
+      # announcing itself as an available update. Fail loudly instead.
+      - name: Resolve and verify version
+        id: version
+        run: |
+          BUILD_VERSION=$(grep -oP 'val appVersionName = "\K[0-9]+\.[0-9]+\.[0-9]+' app/build.gradle.kts)
+          if [ -z "$BUILD_VERSION" ]; then
+            echo "::error::Could not read appVersionName from app/build.gradle.kts"
+            exit 1
+          fi
+
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            TAG="${GITHUB_REF_NAME}"
+            if [ "${TAG#v}" != "$BUILD_VERSION" ]; then
+              echo "::error::Tag $TAG does not match appVersionName $BUILD_VERSION."
+              echo "::error::Bump appVersionName in app/build.gradle.kts, or retag."
+              exit 1
+            fi
+          else
+            TAG="v$BUILD_VERSION"
+          fi
+
+          echo "version=$BUILD_VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Releasing $TAG"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-35 build-tools;35.0.0'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Generate Gradle wrapper
+        run: |
+          for attempt in 1 2 3; do
+            if gradle wrapper --gradle-version 8.10.2; then
+              exit 0
+            fi
+            echo "::warning::Gradle wrapper generation failed (attempt $attempt/3), retrying"
+            sleep 20
+          done
+          echo "::error::Gradle wrapper generation failed after 3 attempts"
+          exit 1
+
+      # Debug, not release. Every installed copy is signed with the checked-in
+      # debug key, and Android refuses to update in place across a signature
+      # change — a release-signed APK would force an uninstall and take the
+      # user's recorded history with it.
+      - name: Build APK
+        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace --no-configuration-cache
+
+      - name: Name the APK
+        run: |
+          mv app/build/outputs/apk/debug/app-debug.apk \
+             "body-measure-${{ steps.version.outputs.version }}.apk"
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          APK="body-measure-${{ steps.version.outputs.version }}.apk"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG exists; replacing its APK."
+            gh release upload "$TAG" "$APK" --clobber
+          else
+            gh release create "$TAG" "$APK" \
+              --title "$TAG" \
+              --generate-notes \
+              --target "$GITHUB_SHA"
+          fi

@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!--
+        Lets the app hand a downloaded APK to the system package installer.
+        It does not grant silent installation: the user still has to allow this
+        app as an install source in Settings, and still has to confirm each
+        install in the system dialog. Both are enforced by the platform.
+    -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:name=".BodyMeasureApplication"

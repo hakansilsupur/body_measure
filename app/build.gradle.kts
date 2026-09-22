@@ -10,6 +10,28 @@ ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
+/**
+ * The one place the app's version is written.
+ *
+ * `versionCode` is derived from it rather than maintained beside it, and the
+ * release workflow refuses to publish a tag that disagrees with it. Both guards
+ * exist for the same reason: the in-app updater compares the running
+ * `versionName` against the release tag, so if those two can drift, an update
+ * can install successfully and still report itself as out of date — and the app
+ * then prompts for the same version forever.
+ */
+val appVersionName = "1.2.0"
+
+fun versionCodeFrom(name: String): Int {
+    val parts = name.split(".")
+    require(parts.size == 3) { "versionName must be major.minor.patch, got '$name'" }
+    val (major, minor, patch) = parts.map {
+        it.toIntOrNull() ?: throw GradleException("versionName part '$it' is not a number")
+    }
+    require(minor < 1000 && patch < 1000) { "minor and patch must each stay under 1000" }
+    return major * 1_000_000 + minor * 1_000 + patch
+}
+
 android {
     namespace = "com.bodymeasure.app"
     compileSdk = 35
@@ -18,8 +40,8 @@ android {
         applicationId = "com.bodymeasure.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = versionCodeFrom(appVersionName)
+        versionName = appVersionName
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -62,6 +84,9 @@ android {
 
     buildFeatures {
         compose = true
+        // The updater reads BuildConfig.VERSION_NAME to compare itself against
+        // the latest release tag. Off by default since AGP 8.
+        buildConfig = true
     }
 
     packaging {
