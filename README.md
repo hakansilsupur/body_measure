@@ -251,8 +251,7 @@ recorded before this feature existed get analysed too.
 
 | Metric | Needs | What it says |
 |---|---|---|
-| Lean / fat mass | body-fat inputs | Splits weight into fat and everything else |
-| FFMI | body-fat inputs | Lean mass scaled to height, comparable across body sizes |
+| Body composition | weight + height (body-fat inputs for the rest) | Lean / fat mass split, plus BMI, body fat % and FFMI each placed on a banded reference bar |
 | Waist-to-height | waist, height | Central-fat risk; better predictor than BMI |
 | Waist-to-hip | waist, hip | Where fat sits, against WHO thresholds |
 | Waist in context | waist | Your waist on a scale carrying both WHO cut-points and the typical population range |
@@ -281,6 +280,32 @@ in most surveyed populations the typical range already reaches or passes the
 increased-risk line. Being at or below average therefore says very little about
 health, and the card says so outright. The thresholds are the reference; the
 average is only there to give the number scale.
+
+### The composition range bars
+
+BMI, body fat and FFMI each sit on a segmented bar: the reference zones as a
+track, a marker at your value, and each zone's name and bounds underneath. The
+zone you are in is drawn at full strength; the others are faded so the scale
+stays readable for context.
+
+The boundaries come from the same functions that label these numbers elsewhere
+in the app (`Bmi.categorize`, `BodyFat.categorize`, `BodyAnalysis.ffmiBand`),
+collected in `util/ReferenceRanges.kt`, so a bar can never disagree with the
+label next to it.
+
+The middle zone is deliberately **not** called "average" on every bar, because
+it does not mean that on every bar:
+
+| Metric | Zones | Middle zone is |
+|---|---|---|
+| BMI | Under / Healthy / Over / Obese (WHO) | the healthy range — the population average sits *above* it |
+| Body fat | Lean / Average / High (ACE, collapsed) | ACE's "average" band |
+| FFMI | Below / Average / Above | the typical untrained range |
+
+BMI keeps WHO's separate obese zone rather than folding it into "above", since
+that is the boundary the classification actually turns on. FFMI's single
+"above" zone spans above-average, athletic and exceptional; the finer band is
+printed as the caption so that detail is not lost.
 
 ### On the "ideal" proportions
 

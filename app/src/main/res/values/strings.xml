@@ -78,14 +78,13 @@
     <string name="analysis_disclaimer">These are estimates from tape measurements, not a clinical body-composition assessment. Trends over time are more meaningful than any single number.</string>
 
     <string name="analysis_lean_mass">Lean mass</string>
-    <string name="analysis_lean_mass_help">Everything that isn\'t fat — muscle, bone, organs and water. A tape measure can\'t separate muscle from the rest, so this is the closest honest figure.</string>
     <string name="analysis_fat_mass">Fat mass</string>
     <string name="analysis_fat_mass_help">Your weight multiplied by body-fat percentage.</string>
     <string name="analysis_composition">Body composition</string>
+    <string name="analysis_composition_help">Lean mass is everything that isn\'t fat — muscle, bone, organs and water. A tape measure can\'t separate muscle from the rest, so this is the closest honest figure.\n\nThe bars place each number on its reference scale, and the middle band means something different on each. For BMI it is the WHO healthy range, not the average: most adults sit above it. For body fat it is the ACE \"average\" band. For FFMI (lean mass scaled to height, the usual stand-in for \"how muscular am I\") it is the typical untrained range; around 25 for men or 19 for women is near the drug-free ceiling.\n\nBMI can\'t tell muscle from fat, so a muscular person can read \"over\" while being lean — which is why it sits next to body fat and FFMI here rather than on its own.</string>
+    <string name="analysis_composition_needs">Add %1$s to add body fat and FFMI here</string>
 
     <string name="analysis_ffmi">FFMI</string>
-    <string name="analysis_ffmi_full">Fat-free mass index</string>
-    <string name="analysis_ffmi_help">Lean mass scaled to your height, so it compares fairly across body sizes. This is the usual stand-in for "how muscular am I". Around 25 (men) or 19 (women) is near the drug-free ceiling.</string>
     <string name="ffmi_below_average">Below average</string>
     <string name="ffmi_average">Average</string>
     <string name="ffmi_above_average">Above average</string>

@@ -30,19 +30,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bodymeasure.app.R
 import com.bodymeasure.app.data.Measurement
 import com.bodymeasure.app.util.AnchorRange
+import com.bodymeasure.app.util.Bmi
 import com.bodymeasure.app.util.BodyAnalysis
+import com.bodymeasure.app.util.BodyFat
 import com.bodymeasure.app.util.ClassicalProportions
 import com.bodymeasure.app.util.ProportionRow
+import com.bodymeasure.app.util.RangeScale
+import com.bodymeasure.app.util.ReferenceRanges
 import com.bodymeasure.app.util.FfmiBand
 import com.bodymeasure.app.util.RiskLevel
 import com.bodymeasure.app.util.Sex
 import com.bodymeasure.app.util.TaperRatio
 import com.bodymeasure.app.util.WaistReference
 import com.bodymeasure.app.util.WaistRisk
+import com.bodymeasure.app.util.ZoneTone
 import java.text.DateFormat
 import java.util.Date
 import kotlin.math.abs
@@ -103,53 +109,82 @@ fun AnalysisScreen(items: List<Measurement>) {
         )
 
         // ---- Body composition ----
+        // BMI needs only weight and height, which every entry has, so the card
+        // always has something to show. Body fat and FFMI join it once the
+        // tape measurements that unlock body fat are recorded.
+        val ffmiBand = ffmi?.let { BodyAnalysis.ffmiBand(sex, it) }
+        val ffmiLabel = when (ffmiBand) {
+            FfmiBand.BelowAverage -> stringResource(R.string.ffmi_below_average)
+            FfmiBand.Average -> stringResource(R.string.ffmi_average)
+            FfmiBand.AboveAverage -> stringResource(R.string.ffmi_above_average)
+            FfmiBand.Athletic -> stringResource(R.string.ffmi_athletic)
+            FfmiBand.Exceptional -> stringResource(R.string.ffmi_exceptional)
+            null -> ""
+        }
         AnalysisCard(
             title = stringResource(R.string.analysis_composition),
-            help = stringResource(R.string.analysis_lean_mass_help),
-            missing = if (leanMass == null) bodyFatNeeds else null
+            help = stringResource(R.string.analysis_composition_help),
+            missing = null
         ) {
-            if (leanMass != null && fatMass != null) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    MetricPair(
-                        label = stringResource(R.string.analysis_lean_mass),
-                        value = "${BodyAnalysis.format1(leanMass)} kg",
-                        sub = leanPct?.let { "${BodyAnalysis.format1(it)}% of body weight" },
-                        color = Strong,
-                        modifier = Modifier.weight(1f)
-                    )
-                    VerticalDivider(modifier = Modifier.height(60.dp))
-                    MetricPair(
-                        label = stringResource(R.string.analysis_fat_mass),
-                        value = "${BodyAnalysis.format1(fatMass)} kg",
-                        sub = latest.bodyFatPct?.let { "${BodyAnalysis.format1(it)}% of body weight" },
-                        color = Warn,
-                        modifier = Modifier.weight(1f)
+            Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
+                if (leanMass != null && fatMass != null) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        MetricPair(
+                            label = stringResource(R.string.analysis_lean_mass),
+                            value = "${BodyAnalysis.format1(leanMass)} kg",
+                            sub = leanPct?.let { "${BodyAnalysis.format1(it)}% of body weight" },
+                            color = Strong,
+                            modifier = Modifier.weight(1f)
+                        )
+                        VerticalDivider(modifier = Modifier.height(60.dp))
+                        MetricPair(
+                            label = stringResource(R.string.analysis_fat_mass),
+                            value = "${BodyAnalysis.format1(fatMass)} kg",
+                            sub = latest.bodyFatPct?.let { "${BodyAnalysis.format1(it)}% of body weight" },
+                            color = Warn,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+
+                RangeBar(
+                    label = stringResource(R.string.bmi),
+                    valueText = Bmi.format(latest.bmi),
+                    caption = null,
+                    value = latest.bmi,
+                    scale = ReferenceRanges.bmi()
+                )
+
+                val bf = latest.bodyFatPct
+                if (bf != null) {
+                    RangeBar(
+                        label = stringResource(R.string.body_fat),
+                        valueText = "${BodyFat.format(bf)}%",
+                        caption = null,
+                        value = bf,
+                        scale = ReferenceRanges.bodyFat(sex)
                     )
                 }
-            }
-        }
 
-        // ---- FFMI ----
-        val ffmiBand = ffmi?.let { BodyAnalysis.ffmiBand(sex, it) }
-        val (ffmiLabel, ffmiColor) = when (ffmiBand) {
-            FfmiBand.BelowAverage -> stringResource(R.string.ffmi_below_average) to Info
-            FfmiBand.Average -> stringResource(R.string.ffmi_average) to Info
-            FfmiBand.AboveAverage -> stringResource(R.string.ffmi_above_average) to Good
-            FfmiBand.Athletic -> stringResource(R.string.ffmi_athletic) to Strong
-            FfmiBand.Exceptional -> stringResource(R.string.ffmi_exceptional) to Strong
-            null -> "" to Color.Unspecified
-        }
-        AnalysisCard(
-            title = stringResource(R.string.analysis_ffmi_full),
-            help = stringResource(R.string.analysis_ffmi_help),
-            missing = if (ffmi == null) bodyFatNeeds else null
-        ) {
-            if (ffmi != null) {
-                BigValue(
-                    value = BodyAnalysis.format1(ffmi),
-                    caption = ffmiLabel,
-                    color = ffmiColor
-                )
+                if (ffmi != null) {
+                    RangeBar(
+                        label = stringResource(R.string.analysis_ffmi),
+                        valueText = BodyAnalysis.format1(ffmi),
+                        // The bar lumps above-average, athletic and exceptional
+                        // into one zone; the caption keeps the finer band.
+                        caption = ffmiLabel,
+                        value = ffmi,
+                        scale = ReferenceRanges.ffmi(sex)
+                    )
+                }
+
+                if (bf == null) {
+                    Text(
+                        stringResource(R.string.analysis_composition_needs, bodyFatNeeds),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
             }
         }
 
@@ -716,6 +751,121 @@ private fun AnalysisCard(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+    }
+}
+
+private fun toneColor(tone: ZoneTone, muted: Color): Color = when (tone) {
+    ZoneTone.Low -> Info
+    ZoneTone.Mid -> Good
+    ZoneTone.High -> Warn
+    ZoneTone.Alert -> Bad
+    ZoneTone.Strong -> Strong
+    ZoneTone.Muted -> muted
+}
+
+/**
+ * A value placed on a banded reference scale: the zones as a segmented track,
+ * a marker where the value sits, and each zone's name and bounds underneath.
+ *
+ * The zone the value falls in is drawn at full strength and its label bolded;
+ * the rest are faded. That keeps the whole scale visible for context while making
+ * it obvious at a glance which band applies — without a verdict word doing the
+ * work the picture already does.
+ */
+@Composable
+private fun RangeBar(
+    label: String,
+    valueText: String,
+    caption: String?,
+    value: Double,
+    scale: RangeScale
+) {
+    val current = scale.zoneFor(value)
+    val muted = MaterialTheme.colorScheme.outline
+    val marker = MaterialTheme.colorScheme.onSurface
+    val currentColor = toneColor(current.tone, muted)
+
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(label, style = MaterialTheme.typography.bodyMedium)
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(valueText, style = MaterialTheme.typography.titleMedium, color = currentColor)
+                Text(
+                    "  ${caption?.takeIf { it.isNotBlank() } ?: current.label}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = currentColor
+                )
+            }
+        }
+        Spacer(Modifier.height(6.dp))
+
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth().height(20.dp)) {
+            val full = maxWidth
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(10.dp)
+                    .align(Alignment.Center)
+                    .clip(RoundedCornerShape(5.dp))
+            ) {
+                scale.zones.forEach { zone ->
+                    val w = scale.width(zone)
+                    if (w > 0f) {
+                        val base = toneColor(zone.tone, muted)
+                        Box(
+                            Modifier
+                                .weight(w)
+                                .fillMaxHeight()
+                                .background(if (zone == current) base else base.copy(alpha = 0.3f))
+                        )
+                    }
+                }
+            }
+            // Marker: a bar taller than the track, so it reads on any zone colour.
+            Box(
+                Modifier
+                    .offset(x = (full * scale.position(value) - 2.dp).coerceIn(0.dp, full - 4.dp))
+                    .width(4.dp)
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(marker)
+            )
+        }
+        Spacer(Modifier.height(2.dp))
+
+        Row(modifier = Modifier.fillMaxWidth()) {
+            scale.zones.forEach { zone ->
+                val w = scale.width(zone)
+                if (w > 0f) {
+                    val here = zone == current
+                    Column(
+                        modifier = Modifier.weight(w),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            zone.label,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = if (here) FontWeight.Bold else FontWeight.Normal,
+                            color = if (here) toneColor(zone.tone, muted)
+                                else MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            softWrap = false
+                        )
+                        Text(
+                            ReferenceRanges.rangeText(zone, scale),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.outline,
+                            maxLines = 1,
+                            softWrap = false
+                        )
+                    }
+                }
+            }
         }
     }
 }
