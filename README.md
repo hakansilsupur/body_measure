@@ -135,8 +135,10 @@ force an uninstall and take the user's history with it.
 git tag v1.3.0 && git push origin v1.3.0
 ```
 
-`versionCode` is derived from `versionName` in the build script, and the release
-workflow refuses to publish when the tag and `appVersionName` disagree. Both
+The tag can be written `v1.3` or `v1.3.0`; missing parts count as zero, exactly as
+the app reads it. `versionCode` is derived from `versionName` in the build
+script, and the release workflow refuses to publish when the tag and
+`appVersionName` disagree. Both
 guards protect the same failure: the updater compares the running `versionName`
 against the release tag, so if those can drift, an update installs successfully
 and then announces itself as available forever.

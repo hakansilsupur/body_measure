@@ -39,8 +39,26 @@ jobs:
 
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
             TAG="${GITHUB_REF_NAME}"
-            if [ "${TAG#v}" != "$BUILD_VERSION" ]; then
-              echo "::error::Tag $TAG does not match appVersionName $BUILD_VERSION."
+            # Read the tag the way the app's AppVersion.parse does: optional
+            # leading v, missing minor/patch count as 0, pre-release suffix
+            # ignored. So v1.2, v1.2.0 and 1.2.0 all mean 1.2.0 — comparing the
+            # raw text would reject a tag the updater handles correctly.
+            RAW="${TAG#v}"; RAW="${RAW#V}"; RAW="${RAW%%-*}"; RAW="${RAW%%+*}"
+            IFS=. read -r MAJOR MINOR PATCH EXTRA <<< "$RAW"
+            MINOR="${MINOR:-0}"; PATCH="${PATCH:-0}"
+            for part in "$MAJOR" "$MINOR" "$PATCH"; do
+              if ! [[ "$part" =~ ^[0-9]+$ ]]; then
+                echo "::error::Tag $TAG is not a version (expected v1.2 or v1.2.0)"
+                exit 1
+              fi
+            done
+            if [ -n "$EXTRA" ]; then
+              echo "::error::Tag $TAG has more than three version parts"
+              exit 1
+            fi
+            TAG_VERSION="$((10#$MAJOR)).$((10#$MINOR)).$((10#$PATCH))"
+            if [ "$TAG_VERSION" != "$BUILD_VERSION" ]; then
+              echo "::error::Tag $TAG ($TAG_VERSION) does not match appVersionName $BUILD_VERSION."
               echo "::error::Bump appVersionName in app/build.gradle.kts, or retag."
               exit 1
             fi
