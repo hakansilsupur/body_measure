@@ -31,6 +31,7 @@ class MeasurementDraft {
     var thigh by mutableStateOf("")
     var calf by mutableStateOf("")
     var wrist by mutableStateOf("")
+    var shoulder by mutableStateOf("")
 
     /** File name of the attached progress photo, or null when none is set. */
     var photoFileName by mutableStateOf<String?>(null)
@@ -53,6 +54,7 @@ class MeasurementDraft {
         thigh = ""
         calf = ""
         wrist = ""
+        shoulder = ""
         photoFileName = null
     }
 
@@ -72,6 +74,7 @@ class MeasurementDraft {
         thigh = m.thighCm.toField()
         calf = m.calfCm.toField()
         wrist = m.wristCm.toField()
+        shoulder = m.shoulderCm.toField()
         photoFileName = m.photoFileName
     }
 
@@ -94,6 +97,7 @@ class MeasurementDraft {
             thighCm = thigh.toDoubleOrNull(),
             calfCm = calf.toDoubleOrNull(),
             wristCm = wrist.toDoubleOrNull(),
+            shoulderCm = shoulder.toDoubleOrNull(),
             neckCm = neck.toDoubleOrNull(),
             photoFileName = photoFileName
         )

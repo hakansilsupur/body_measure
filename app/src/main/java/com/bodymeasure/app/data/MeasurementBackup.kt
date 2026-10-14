@@ -39,6 +39,7 @@ object MeasurementBackup {
                     putOrNull("thighCm", m.thighCm)
                     putOrNull("calfCm", m.calfCm)
                     putOrNull("wristCm", m.wristCm)
+                    putOrNull("shoulderCm", m.shoulderCm)
                     putOrNull("neckCm", m.neckCm)
                     put("bmi", m.bmi)
                     putOrNull("bodyFatPct", m.bodyFatPct)
@@ -104,6 +105,7 @@ object MeasurementBackup {
                 thighCm = o.doubleOrNull("thighCm"),
                 calfCm = o.doubleOrNull("calfCm"),
                 wristCm = o.doubleOrNull("wristCm"),
+                shoulderCm = o.doubleOrNull("shoulderCm"),
                 neckCm = o.doubleOrNull("neckCm"),
                 bmi = o.doubleOrNull("bmi") ?: (weight / ((height / 100.0) * (height / 100.0))),
                 bodyFatPct = o.doubleOrNull("bodyFatPct"),

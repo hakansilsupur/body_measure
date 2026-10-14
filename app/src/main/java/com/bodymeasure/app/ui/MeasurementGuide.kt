@@ -89,6 +89,11 @@ enum class MeasurementGuide(
         titleRes = R.string.guide_wrist_title,
         imageRes = R.drawable.measure_wrist,
         textRes = R.string.guide_wrist_text
+    ),
+    Shoulder(
+        titleRes = R.string.guide_shoulder_title,
+        imageRes = R.drawable.measure_shoulder,
+        textRes = R.string.guide_shoulder_text
     )
 }
 

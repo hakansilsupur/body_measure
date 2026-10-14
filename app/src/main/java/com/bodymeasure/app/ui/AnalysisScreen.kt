@@ -318,10 +318,10 @@ fun AnalysisScreen(items: List<Measurement>) {
         // Each row carries its own reference and its own direction, so a bare
         // ratio never has to be interpreted in a vacuum.
         val taperRows = TaperRatio.entries.mapNotNull { kind ->
-            val now = BodyAnalysis.taper(kind, latest.chestCm, latest.waistCm, latest.hipCm)
+            val now = BodyAnalysis.taper(kind, latest.chestCm, latest.waistCm, latest.hipCm, latest.shoulderCm)
                 ?: return@mapNotNull null
             val before = previous?.let {
-                BodyAnalysis.taper(kind, it.chestCm, it.waistCm, it.hipCm)
+                BodyAnalysis.taper(kind, it.chestCm, it.waistCm, it.hipCm, it.shoulderCm)
             }
             Triple(kind, now, before)
         }
@@ -527,6 +527,7 @@ private fun ProgressCard(items: List<Measurement>) {
     val rows = listOf(
         Triple("Weight", "kg", Triple(current.weightKg, previous.weightKg, first.weightKg)),
         Triple("Waist", "cm", Triple(current.waistCm, previous.waistCm, first.waistCm)),
+        Triple("Shoulder", "cm", Triple(current.shoulderCm, previous.shoulderCm, first.shoulderCm)),
         Triple("Chest", "cm", Triple(current.chestCm, previous.chestCm, first.chestCm)),
         Triple("Arm", "cm", Triple(current.armCm, previous.armCm, first.armCm)),
         Triple("Thigh", "cm", Triple(current.thighCm, previous.thighCm, first.thighCm)),

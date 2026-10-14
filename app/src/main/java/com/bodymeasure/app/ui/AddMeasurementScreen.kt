@@ -148,6 +148,9 @@ fun AddMeasurementScreen(
         NumberField(value = draft.hip, onChange = { draft.hip = it },
             label = stringResource(R.string.hip_cm),
             onInfoClick = { openGuide = MeasurementGuide.Hip })
+        NumberField(value = draft.shoulder, onChange = { draft.shoulder = it },
+            label = stringResource(R.string.shoulder_cm),
+            onInfoClick = { openGuide = MeasurementGuide.Shoulder })
         NumberField(value = draft.chest, onChange = { draft.chest = it },
             label = stringResource(R.string.chest_cm),
             onInfoClick = { openGuide = MeasurementGuide.Chest })

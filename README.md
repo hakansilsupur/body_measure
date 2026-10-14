@@ -6,7 +6,8 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
 ## Features
 
 - Record weight & height — BMI is computed automatically.
-- Optional measurements: neck, waist, hip, chest, arm, thigh, calf, wrist
+- Optional measurements: neck, shoulder, waist, hip, chest, arm, thigh, calf,
+  wrist
   (all in cm).
 - Measurement date is editable, so a session can be logged after the fact;
   history, charts and analysis all order by that date.
@@ -18,8 +19,8 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
   picked.
 - Live BMI / body-fat / BMR / TDEE preview card as you type.
 - **Trends tab** charting every recorded value over time — BMI, weight, body
-  fat, FFMI, BMR, and each circumference (waist, chest, arm, thigh, calf,
-  wrist, hip, neck).
+  fat, FFMI, BMR, and each circumference (waist, shoulder, chest, arm,
+  thigh, calf, wrist, hip, neck).
 - **Analysis tab**: lean/fat mass, FFMI, waist-to-height, waist-to-hip and
   healthy weight range, all derived from what you already entered.
 - **In-app updates** — checks GitHub Releases on launch and on demand, then
@@ -259,7 +260,7 @@ recorded before this feature existed get analysed too.
 | Waist in context | waist | Your waist on a scale carrying both WHO cut-points and the typical population range |
 | Healthy weight range | height | Weight span for BMI 18.5–24.9 |
 | Thigh circumference | thigh | Leg muscle as a cardiovascular marker |
-| Taper | chest + waist/hip | Chest-to-waist and chest-to-hip, each against its classical figure and its change since the last entry |
+| Taper | shoulder or chest + waist/hip | Shoulder-to-waist, chest-to-waist and chest-to-hip, each against its reference figure and its change since the last entry |
 | Change over time | 2+ entries | Every measurement vs. your previous and first entry |
 | Classical proportions | chest + any circumference | Your girths against the McCallum "ideal" physique |
 
@@ -387,6 +388,14 @@ have no established reference to compare against, and because they share the
 waist denominator with chest-to-waist they simply restate it — three rows moving
 in lockstep read as three findings when they are one.
 
+Shoulder-to-waist is the one taper row whose reference does not come from
+McCallum — his figures have no shoulder site at all. It is set against the
+golden ratio, 1.618, the "Adonis index" popularised in modern fitness writing.
+That is no more a health standard than the classical figures are; it gets the
+same treatment (value, reference beside it, coloured change since last entry,
+no pass or fail). Shoulder is measured as a circumference over both deltoids,
+not a width, so it divides cleanly by the waist circumference.
+
 The exception to all of this is absolute thigh circumference, which has an
 actual cohort study behind it and is labelled with its source and its limits.
 
@@ -502,7 +511,7 @@ The **Trends** tab stacks one line chart per value, derived metrics first:
 3. Body-fat % (only entries where it could be computed)
 4. FFMI
 5. BMR (kcal/day)
-6. Each circumference recorded — waist, chest, arm, thigh, calf, wrist, hip, neck
+6. Each circumference recorded — waist, shoulder, chest, arm, thigh, calf, wrist, hip, neck
 
 A chart is skipped entirely when you have never recorded that value, rather than
 showing an empty card for every field you don't track.
@@ -518,8 +527,8 @@ dependency.
 
 ## How-to-measure tutorials
 
-The eight tape-measurement fields (neck, waist, hip, chest, arm, thigh, calf,
-wrist) on the Record screen each show a small ⓘ icon. Tapping it opens a dialog
+The nine tape-measurement fields (neck, waist, hip, shoulder, chest, arm, thigh,
+calf, wrist) on the Record screen each show a small ⓘ icon. Tapping it opens a dialog
 with a photo of the technique and short text instructions.
 
 ### The diagrams

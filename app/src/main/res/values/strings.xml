@@ -22,6 +22,7 @@
     <string name="thigh_cm">Thigh (cm)</string>
     <string name="calf_cm">Calf (cm)</string>
     <string name="wrist_cm">Wrist (cm)</string>
+    <string name="shoulder_cm">Shoulder (cm)</string>
     <string name="neck_cm">Neck (cm)</string>
 
     <string name="save">Save</string>
@@ -114,11 +115,11 @@
     <string name="risk_high">High risk</string>
 
     <string name="analysis_proportions">Taper</string>
-    <string name="analysis_proportions_help">How much your torso narrows from chest to waist and hip. There is no medical threshold here — the classical figure shown beside each ratio is an aesthetic convention, not a health target, and for reference a typical adult man measures around 1.00–1.05 chest to waist. What matters is the direction: a rising chest-to-waist means the waist held while the chest grew. Green marks movement toward the classical figure, orange away from it.\n\nArm-to-waist and thigh-to-waist used to appear here and were removed. They have no reference to compare against, and since they share the waist denominator they only restate the chest-to-waist number — three rows moving together look like three findings when they are one.</string>
+    <string name="analysis_proportions_help">How much your torso narrows from the shoulders and chest down to the waist and hip. There is no medical threshold here — the classical figure shown beside each ratio is an aesthetic convention, not a health target, and for reference a typical adult man measures around 1.00–1.05 chest to waist. What matters is the direction: a rising chest-to-waist means the waist held while the chest grew. Shoulder to waist is set against the golden ratio, 1.618 (the \"Adonis index\"), a modern fitness convention rather than McCallum\'s, since his figures include no shoulder measurement. Green marks movement toward the reference figure, orange away from it.\n\nArm-to-waist and thigh-to-waist used to appear here and were removed. They have no reference to compare against, and since they share the waist denominator they only restate the chest-to-waist number — three rows moving together look like three findings when they are one.</string>
     <string name="analysis_taper_value">%1$s  ·  classic %2$s</string>
     <string name="analysis_taper_change">%1$s since %2$s</string>
     <string name="analysis_taper_single">First entry — no change to show yet</string>
-    <string name="analysis_proportions_needs">chest, plus waist or hip</string>
+    <string name="analysis_proportions_needs">shoulder or chest, plus waist or hip</string>
 
     <string name="analysis_classic">Classical proportions</string>
     <string name="analysis_classic_help">These ratios come from mid-20th-century bodybuilding — John McCallum\'s figures, rooted in the physiques of Sandow and Steve Reeves. They are one era\'s aesthetic convention, not a health standard: hardly anyone matches the full set, the waist figure is far narrower than most people carry, and none of it says anything about how healthy or strong you are. Shown as a reference to compare against, not a target to hit — which is why nothing here is marked pass or fail.</string>
@@ -146,6 +147,7 @@
     <string name="trends_thigh">Thigh (cm) over time</string>
     <string name="trends_calf">Calf (cm) over time</string>
     <string name="trends_wrist">Wrist (cm) over time</string>
+    <string name="trends_shoulder">Shoulder (cm) over time</string>
     <string name="trends_hip">Hip (cm) over time</string>
     <string name="trends_neck">Neck (cm) over time</string>
 
@@ -210,6 +212,8 @@
 
     <string name="guide_wrist_title">Measuring your wrist</string>
     <string name="guide_wrist_text">Wrap the tape around the narrowest point of the wrist, just below the bony knob on the outside and above the hand. Keep the hand relaxed and open. Wrist is almost pure bone and tendon, so it barely changes with training or weight — which is what makes it useful as a measure of your frame size.</string>
+    <string name="guide_shoulder_title">Measuring your shoulders</string>
+    <string name="guide_shoulder_text">This is a circumference, not a width: the tape goes all the way round. Stand relaxed with arms hanging at your sides and pass the tape around the widest point of the shoulders — across the bulge of both deltoids at the front, and over the top of the shoulder blades at the back. Keep it level all the way round and breathe out normally; don\'t flare your lats or puff the chest, or the number will move with your posture rather than your build. It helps to have someone else hold the tape at the back.</string>
 
     <string name="guide_calf_title">Measuring your calf</string>
     <string name="guide_calf_text">Stand with your weight even on both feet — the calf flattens if the leg is relaxed or raised. Wrap the tape around the widest part of the calf, roughly a third of the way down from the knee, and keep it level with the floor. Measure the same leg each time.</string>

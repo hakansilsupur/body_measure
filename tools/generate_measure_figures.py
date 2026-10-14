@@ -45,6 +45,7 @@ BASE_W, BASE_H = 960, 1090
 # Landmarks measured from the front figure, in base-image pixels.
 # cx/rx describe the body width at that height, so the tape ellipse matches it.
 NECK   = dict(y=196, cx=315, rx=43)
+SHOULDER = dict(y=250, cx=314, rx=132)  # widest point, across both deltoid caps
 CHEST  = dict(y=288, cx=316, rx=89)
 WAIST  = dict(y=412, cx=316, rx=73)
 HIP    = dict(y=521, cx=313, rx=102)
@@ -209,6 +210,15 @@ def build():
     f.callout(CHEST["cx"] + CHEST["rx"], CHEST["y"], ["across the", "nipple line"], dy=0)
     f.caption("Arms relaxed; read at the end of a normal breath out")
     figs["chest"] = f
+
+    # Shoulders - round the widest point, over both deltoids. The tape wraps
+    # the arms too, which is the point: it is a circumference, not a width.
+    f = Fig(body, (144, 60, 340, 453))
+    f.add(W(SHOULDER))
+    f.callout(SHOULDER["cx"] + SHOULDER["rx"], SHOULDER["y"],
+              ["widest point,", "over both deltoids"], dy=0)
+    f.caption("Arms hanging relaxed; don\u2019t flare the back or lift the chest")
+    figs["shoulder"] = f
 
     # Waist - at the navel
     f = Fig(body, (166, 212, 300, 400))

@@ -14,6 +14,14 @@ enum class RiskLevel { Low, Moderate, High }
  * lockstep read as a pattern when they are one number.
  */
 enum class TaperRatio(val label: String, val classic: Double) {
+    /**
+     * The "Adonis index": shoulder circumference over waist, against the golden
+     * ratio. Like McCallum's figures it is an aesthetic convention popularised
+     * in fitness writing, not a health measure — and McCallum's own set has no
+     * shoulder site, which is why this one carries its own reference.
+     */
+    ShoulderToWaist("Shoulder / waist", 1.618),
+
     /** The V-taper. Classical waist is 70% of chest, so the ratio is 1/0.70. */
     ChestToWaist("Chest / waist", 1.0 / 0.70),
 
@@ -154,8 +162,15 @@ object BodyAnalysis {
     }
 
     /** The taper ratio for [kind], or null when a needed measurement is absent. */
-    fun taper(kind: TaperRatio, chestCm: Double?, waistCm: Double?, hipCm: Double?): Double? =
+    fun taper(
+        kind: TaperRatio,
+        chestCm: Double?,
+        waistCm: Double?,
+        hipCm: Double?,
+        shoulderCm: Double?
+    ): Double? =
         when (kind) {
+            TaperRatio.ShoulderToWaist -> ratio(shoulderCm, waistCm)
             TaperRatio.ChestToWaist -> ratio(chestCm, waistCm)
             TaperRatio.ChestToHip -> ratio(chestCm, hipCm)
         }
