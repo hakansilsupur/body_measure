@@ -147,6 +147,14 @@ fun AnalysisScreen(items: List<Measurement>) {
                     }
                 }
 
+                MuscleEstimate(
+                    sex = sex,
+                    muscleKg = BodyAnalysis.skeletalMuscleKg(
+                        sex, latest.ageYears, latest.weightKg, latest.heightCm
+                    ),
+                    weightKg = latest.weightKg
+                )
+
                 RangeBar(
                     label = stringResource(R.string.bmi),
                     valueText = Bmi.format(latest.bmi),
@@ -753,6 +761,75 @@ private fun AnalysisCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+/**
+ * Approximate skeletal muscle from the Lee (2000) equation, against the adult
+ * average from MRI. Shown with its likely range rather than as one confident
+ * number, because the equation cannot see body composition — see
+ * [BodyAnalysis.skeletalMuscleKg] for why it is deliberately not tracked.
+ */
+@Composable
+private fun MuscleEstimate(sex: Sex, muscleKg: Double?, weightKg: Double) {
+    if (muscleKg == null) {
+        Text(
+            stringResource(R.string.analysis_muscle_needs_age),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.outline
+        )
+        return
+    }
+    val pct = BodyAnalysis.musclePercent(muscleKg, weightKg) ?: return
+    val avg = BodyAnalysis.averageMusclePercent(sex)
+    val low = (muscleKg - BodyAnalysis.MUSCLE_SEE_KG).coerceAtLeast(0.0)
+    val high = muscleKg + BodyAnalysis.MUSCLE_SEE_KG
+
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(stringResource(R.string.analysis_muscle), style = MaterialTheme.typography.bodyMedium)
+            Text(
+                "\u2248 ${BodyAnalysis.format1(muscleKg)} kg",
+                style = MaterialTheme.typography.titleMedium,
+                color = Strong
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                stringResource(R.string.analysis_muscle_pct, BodyAnalysis.format1(pct)),
+                style = MaterialTheme.typography.labelMedium,
+                color = Strong
+            )
+            Text(
+                stringResource(
+                    R.string.analysis_muscle_range,
+                    BodyAnalysis.format1(low),
+                    BodyAnalysis.format1(high)
+                ),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Spacer(Modifier.height(6.dp))
+        // Same bar as the classical card: tick at the reference, scale to 1.5x.
+        ProportionBar(pct / avg)
+        Spacer(Modifier.height(4.dp))
+        Text(
+            stringResource(
+                if (sex == Sex.Male) R.string.analysis_muscle_avg_male
+                else R.string.analysis_muscle_avg_female,
+                BodyAnalysis.format1(avg)
+            ),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.outline
+        )
     }
 }
 

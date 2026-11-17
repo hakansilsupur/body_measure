@@ -254,7 +254,7 @@ recorded before this feature existed get analysed too.
 
 | Metric | Needs | What it says |
 |---|---|---|
-| Body composition | weight + height (body-fat inputs for the rest) | Lean / fat mass split, plus BMI, body fat % and FFMI each placed on a banded reference bar |
+| Body composition | weight + height (body-fat inputs and age for the rest) | Lean / fat mass split, approximate skeletal muscle, plus BMI, body fat % and FFMI each placed on a banded reference bar |
 | Waist-to-height | waist, height | Central-fat risk; better predictor than BMI |
 | Waist-to-hip | waist, hip | Where fat sits, against WHO thresholds |
 | Waist in context | waist | Your waist on a scale carrying both WHO cut-points and the typical population range |
@@ -362,11 +362,31 @@ the card itself.
 
 ### On "muscle ratio"
 
-There is no honest way to isolate **muscle** from a tape measure. Separating
-muscle from bone, organs and water needs skinfold calipers, DEXA or a BIA scale.
-What these inputs support is **lean mass** (everything that isn't fat) and
-**FFMI**, which is the metric normally used as a proxy for muscularity. The app
-labels them that way rather than calling either one "muscle mass".
+A tape measure cannot isolate **muscle**. Separating muscle from bone, organs
+and water needs DEXA, MRI or a BIA scale. What your tape measurements support is
+**lean mass** (everything that isn't fat) and **FFMI**, the metric normally used
+as a proxy for muscularity.
+
+The Body composition card does show an approximate **skeletal muscle** figure,
+but it comes from somewhere else: the Lee et al. (2000) equation, which predicts
+whole-body skeletal muscle from sex, age, height and weight and was validated
+against MRI (R² 0.86, standard error 2.8 kg):
+
+    SM (kg) = 0.244·weight + 7.80·height(m) + 6.6·sex − 0.098·age + race − 3.3
+
+`sex` is 1 for men and 0 for women. The `race` term (−1.2 Asian, +1.4 African
+American, 0 otherwise) is set to 0 because the app does not ask. The card shows
+the estimate with its ±2.8 kg range and its share of body weight, against the
+MRI-measured adult average (38.4 % for men, 30.6 % for women; Janssen et al.
+2000). It needs age, which is optional on the Record form.
+
+Its limitation decides how it is shown. The equation cannot see body
+composition: two people of the same sex, age, height and weight get the same
+answer whatever they are made of, and a kilo of fat gained raises it exactly as
+much as a kilo of muscle. So it is a one-off ballpark. It is not charted in
+Trends and has no change-since-last-entry, because any change it showed would
+just be your weight moving. FFMI, built from your own measurements, is the
+figure to track.
 
 FFMI is height-normalised to 1.8 m (Kouri et al. 1995) so it compares fairly
 across body sizes. Roughly 25 for men and 19 for women sits near the documented

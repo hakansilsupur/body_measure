@@ -36,12 +36,57 @@ enum class FfmiBand { BelowAverage, Average, AboveAverage, Athletic, Exceptional
  * function of stored fields, so nothing extra is persisted and old entries gain
  * these numbers retroactively.
  *
- * Deliberately excluded: anything claiming to isolate *muscle* mass. Separating
- * muscle from bone, organs and water needs skinfold calipers, DEXA or BIA — a
- * tape measure cannot do it. Lean mass and FFMI below are the honest ceiling of
- * what these inputs support.
+ * Muscle is the one figure here that does not come from *your* tape
+ * measurements. Separating muscle from bone, organs and water needs DEXA, MRI
+ * or BIA; the tape can only split fat from everything else (lean mass, FFMI).
+ * [skeletalMuscleKg] is instead a population equation: what MRI found for
+ * people of your sex, age, height and weight. Useful as a ballpark, and
+ * labelled as one everywhere it appears.
  */
 object BodyAnalysis {
+
+    /** Typical error of [skeletalMuscleKg] against MRI (Lee et al. 2000). */
+    const val MUSCLE_SEE_KG = 2.8
+
+    /**
+     * Average skeletal muscle as a share of body weight, measured by whole-body
+     * MRI in 468 adults aged 18-88 (Janssen et al., J Appl Physiol 2000).
+     * A reference point, not a target: it falls with age in both sexes.
+     */
+    fun averageMusclePercent(sex: Sex): Double = if (sex == Sex.Male) 38.4 else 30.6
+
+    /**
+     * Approximate whole-body skeletal muscle, kg — the Lee et al. (2000)
+     * anthropometric equation, validated against MRI (R^2 0.86, SEE 2.8 kg):
+     *
+     *   SM = 0.244 x weight + 7.80 x height(m) + 6.6 x sex - 0.098 x age + race - 3.3
+     *
+     * with sex 1 for men, 0 for women. The race term is -1.2 for Asian and +1.4
+     * for African American adults, 0 otherwise; the app does not ask, so it
+     * uses 0, which adds roughly that much to the error for those groups.
+     *
+     * Its blind spot matters more than its error bar: it cannot see body
+     * composition. Two people of the same sex, age, height and weight get the
+     * same answer whatever they are made of, and gaining a kilo of fat raises
+     * the estimate exactly as much as a kilo of muscle would. So it is a
+     * one-off ballpark, never a trend — which is why it is not charted and has
+     * no "change since last entry". FFMI, which does use your measurements, is
+     * the figure to track.
+     *
+     * Null without an age, since age is a term in the equation.
+     */
+    fun skeletalMuscleKg(sex: Sex, ageYears: Int?, weightKg: Double, heightCm: Double): Double? {
+        if (ageYears == null || ageYears <= 0 || weightKg <= 0 || heightCm <= 0) return null
+        val sexTerm = if (sex == Sex.Male) 1.0 else 0.0
+        val sm = 0.244 * weightKg + 7.80 * (heightCm / 100.0) + 6.6 * sexTerm -
+            0.098 * ageYears - 3.3
+        // Outside the equation's sensible range (extreme inputs) say nothing
+        // rather than print a negative or more-than-bodyweight muscle mass.
+        return sm.takeIf { it.isFinite() && it > 0 && it < weightKg }
+    }
+
+    fun musclePercent(muscleKg: Double, weightKg: Double): Double? =
+        if (weightKg > 0) muscleKg / weightKg * 100.0 else null
 
     /** Everything that isn't fat: muscle, bone, organs, water. */
     fun leanMassKg(weightKg: Double, bodyFatPct: Double?): Double? {
