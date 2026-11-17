@@ -254,7 +254,7 @@ recorded before this feature existed get analysed too.
 
 | Metric | Needs | What it says |
 |---|---|---|
-| Body composition | weight + height (body-fat inputs and age for the rest) | Lean / fat mass split, approximate skeletal muscle, plus BMI, body fat % and FFMI each placed on a banded reference bar |
+| Body composition | weight + height (body-fat inputs, age and optional body water for the rest) | Lean / fat mass split, approximate skeletal muscle (adjusted for body water when given), plus BMI, body fat % and FFMI each placed on a banded reference bar |
 | Waist-to-height | waist, height | Central-fat risk; better predictor than BMI |
 | Waist-to-hip | waist, hip | Where fat sits, against WHO thresholds |
 | Waist in context | waist | Your waist on a scale carrying both WHO cut-points and the typical population range |
@@ -380,13 +380,33 @@ the estimate with its ±2.8 kg range and its share of body weight, against the
 MRI-measured adult average (38.4 % for men, 30.6 % for women; Janssen et al.
 2000). It needs age, which is optional on the Record form.
 
-Its limitation decides how it is shown. The equation cannot see body
-composition: two people of the same sex, age, height and weight get the same
-answer whatever they are made of, and a kilo of fat gained raises it exactly as
-much as a kilo of muscle. So it is a one-off ballpark. It is not charted in
-Trends and has no change-since-last-entry, because any change it showed would
-just be your weight moving. FFMI, built from your own measurements, is the
-figure to track.
+Its limitation decides how it is shown. On its own the equation cannot see
+body composition: two people of the same sex, age, height and weight get the
+same answer whatever they are made of, and a kilo of fat gained raises it
+exactly as much as a kilo of muscle. So it is not charted in Trends and has no
+change-since-last-entry. FFMI, built from your own measurements, is the figure
+to track.
+
+**Body water** (optional, from a smart scale) removes much of that blind spot.
+Lean tissue is about 73 % water and fat holds very little, so water is a proxy
+for how much lean tissue you carry. The app predicts the body water of a typical
+person of your sex, age, height and weight with the Watson et al. (1980)
+equations:
+
+    men:   TBW = 2.447 − 0.09516·age + 0.1074·height(cm) + 0.3362·weight
+    women: TBW = −2.097 + 0.1069·height(cm) + 0.2466·weight
+
+and compares it with your reading. The ratio (say 1.06, meaning 6 % more water
+than typical for your size) scales the Lee estimate, and the card states the
+adjustment and the unadjusted figure. Both equations are published and
+validated; the one added assumption is that muscle scales in proportion to lean
+tissue, which is conservative, since muscle is the part of lean tissue that
+varies most between people.
+
+Two caveats: consumer scales infer body water from electrical impedance rather
+than measuring it, and hydration moves the reading by a kilo or two within a
+day. Only readings taken under the same conditions are comparable. A reading
+outside 35–75 % is treated as a typo and ignored, and the card says so.
 
 FFMI is height-normalised to 1.8 m (Kouri et al. 1995) so it compares fairly
 across body sizes. Roughly 25 for men and 19 for women sits near the documented

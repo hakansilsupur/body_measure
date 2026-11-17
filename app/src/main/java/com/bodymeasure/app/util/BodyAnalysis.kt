@@ -71,7 +71,8 @@ object BodyAnalysis {
      * the estimate exactly as much as a kilo of muscle would. So it is a
      * one-off ballpark, never a trend — which is why it is not charted and has
      * no "change since last entry". FFMI, which does use your measurements, is
-     * the figure to track.
+     * the figure to track. A body-water reading removes much of this blind
+     * spot; see [waterAdjustedMuscleKg].
      *
      * Null without an age, since age is a term in the equation.
      */
@@ -84,6 +85,70 @@ object BodyAnalysis {
         // rather than print a negative or more-than-bodyweight muscle mass.
         return sm.takeIf { it.isFinite() && it > 0 && it < weightKg }
     }
+
+    /**
+     * Total body water a typical adult of this sex, age, height and weight
+     * carries, kg — the Watson et al. (1980) equations, standard in clinical
+     * use (dialysis dosing among others):
+     *
+     *   men:   2.447 - 0.09516 x age + 0.1074 x height(cm) + 0.3362 x weight
+     *   women: -2.097 + 0.1069 x height(cm) + 0.2466 x weight
+     */
+    fun watsonTbwKg(sex: Sex, ageYears: Int, weightKg: Double, heightCm: Double): Double? {
+        if (ageYears <= 0 || weightKg <= 0 || heightCm <= 0) return null
+        val tbw = when (sex) {
+            Sex.Male -> 2.447 - 0.09516 * ageYears + 0.1074 * heightCm + 0.3362 * weightKg
+            Sex.Female -> -2.097 + 0.1069 * heightCm + 0.2466 * weightKg
+        }
+        return tbw.takeIf { it.isFinite() && it > 0 }
+    }
+
+    /**
+     * Body water as a share of weight outside this span is not a plausible
+     * adult reading (scales typically show roughly 45-65%), so it is treated as
+     * a typo or a bad reading and not used, rather than bending the estimate.
+     */
+    val PLAUSIBLE_WATER_PCT = 35.0..75.0
+
+    /**
+     * Your measured body water against the Watson prediction for your size:
+     * 1.06 means 6% more water than typical for your sex, age, height and
+     * weight. Null without age, or when the reading is not plausible.
+     */
+    fun waterRatio(
+        sex: Sex,
+        ageYears: Int?,
+        weightKg: Double,
+        heightCm: Double,
+        bodyWaterPct: Double?
+    ): Double? {
+        if (ageYears == null || bodyWaterPct == null) return null
+        if (bodyWaterPct !in PLAUSIBLE_WATER_PCT) return null
+        val predicted = watsonTbwKg(sex, ageYears, weightKg, heightCm) ?: return null
+        val measured = weightKg * bodyWaterPct / 100.0
+        return (measured / predicted).takeIf { it.isFinite() && it > 0 }
+    }
+
+    /**
+     * [skeletalMuscleKg] corrected for build, using body water.
+     *
+     * The Lee equation predicts muscle for a *typical* person of your sex, age,
+     * height and weight; the Watson equation predicts that same typical person's
+     * body water. Lean tissue is about 73% water and fat holds very little, so
+     * having more water than predicted means carrying more lean tissue than
+     * typical for your size. The muscle estimate is scaled by that same ratio.
+     *
+     * Scaling proportionally is the one assumption added here, and it is a
+     * conservative one: muscle is the main part of lean tissue that varies
+     * between people (organs and bone vary far less), so a real difference in
+     * lean tissue is if anything *more* muscle than the proportional share.
+     *
+     * Note the reading itself: consumer scales infer body water from electrical
+     * impedance, and hydration moves it by a kilo or two within a day. Only
+     * readings taken under the same conditions are comparable.
+     */
+    fun waterAdjustedMuscleKg(muscleKg: Double, ratio: Double, weightKg: Double): Double? =
+        (muscleKg * ratio).takeIf { it.isFinite() && it > 0 && it < weightKg }
 
     fun musclePercent(muscleKg: Double, weightKg: Double): Double? =
         if (weightKg > 0) muscleKg / weightKg * 100.0 else null

@@ -46,6 +46,7 @@ data class MeasurementInput(
     val calfCm: Double?,
     val wristCm: Double?,
     val shoulderCm: Double? = null,
+    val bodyWaterPct: Double? = null,
     val neckCm: Double?,
     val photoFileName: String? = null
 )
@@ -267,6 +268,7 @@ private fun MeasurementInput.toMeasurement(id: Long): Measurement {
         calfCm = calfCm,
         wristCm = wristCm,
         shoulderCm = shoulderCm,
+        bodyWaterPct = bodyWaterPct,
         neckCm = neckCm,
         bmi = bmi,
         bodyFatPct = bodyFat,

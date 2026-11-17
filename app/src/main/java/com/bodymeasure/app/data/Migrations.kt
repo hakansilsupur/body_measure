@@ -17,6 +17,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  * v5 -> v6  added calfCm
  * v6 -> v7  added wristCm
  * v7 -> v8  added shoulderCm
+ * v8 -> v9  added bodyWaterPct
  *
  * Note: `sex` is NOT NULL, so SQLite requires a DEFAULT on the ALTER. The
  * entity deliberately does not declare @ColumnInfo(defaultValue = ...), which
@@ -67,6 +68,12 @@ internal val MIGRATION_7_8 = object : Migration(7, 8) {
     }
 }
 
+internal val MIGRATION_8_9 = object : Migration(8, 9) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE measurements ADD COLUMN bodyWaterPct REAL")
+    }
+}
+
 internal val ALL_MIGRATIONS = arrayOf(
     MIGRATION_1_2,
     MIGRATION_2_3,
@@ -74,5 +81,6 @@ internal val ALL_MIGRATIONS = arrayOf(
     MIGRATION_4_5,
     MIGRATION_5_6,
     MIGRATION_6_7,
-    MIGRATION_7_8
+    MIGRATION_7_8,
+    MIGRATION_8_9
 )

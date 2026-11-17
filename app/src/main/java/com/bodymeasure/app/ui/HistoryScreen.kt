@@ -277,6 +277,7 @@ private fun FlowStats(m: Measurement) {
         m.neckCm?.let { "Neck" to "${fmt(it)} cm" },
         m.waistCm?.let { "Waist" to "${fmt(it)} cm" },
         m.hipCm?.let { "Hip" to "${fmt(it)} cm" },
+        m.bodyWaterPct?.let { "Body water" to "${fmt(it)}%" },
         m.shoulderCm?.let { "Shoulder" to "${fmt(it)} cm" },
         m.chestCm?.let { "Chest" to "${fmt(it)} cm" },
         m.armCm?.let { "Arm" to "${fmt(it)} cm" },

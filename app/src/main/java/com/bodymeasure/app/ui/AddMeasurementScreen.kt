@@ -139,6 +139,9 @@ fun AddMeasurementScreen(
             label = stringResource(R.string.weight_kg))
         NumberField(value = draft.height, onChange = { draft.height = it },
             label = stringResource(R.string.height_cm))
+        NumberField(value = draft.bodyWater, onChange = { draft.bodyWater = it },
+            label = stringResource(R.string.body_water_pct),
+            supporting = stringResource(R.string.body_water_hint))
         NumberField(value = draft.neck, onChange = { draft.neck = it },
             label = stringResource(R.string.neck_cm),
             onInfoClick = { openGuide = MeasurementGuide.Neck })
@@ -419,7 +422,8 @@ private fun NumberField(
     value: String,
     onChange: (String) -> Unit,
     label: String,
-    onInfoClick: (() -> Unit)? = null
+    onInfoClick: (() -> Unit)? = null,
+    supporting: String? = null
 ) {
     OutlinedTextField(
         value = value,
@@ -433,6 +437,7 @@ private fun NumberField(
             onChange(singleDot)
         },
         label = { Text(label) },
+        supportingText = supporting?.let { { Text(it) } },
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
         trailingIcon = onInfoClick?.let { handler ->

@@ -152,7 +152,12 @@ fun AnalysisScreen(items: List<Measurement>) {
                     muscleKg = BodyAnalysis.skeletalMuscleKg(
                         sex, latest.ageYears, latest.weightKg, latest.heightCm
                     ),
-                    weightKg = latest.weightKg
+                    weightKg = latest.weightKg,
+                    bodyWaterPct = latest.bodyWaterPct,
+                    waterRatio = BodyAnalysis.waterRatio(
+                        sex, latest.ageYears, latest.weightKg, latest.heightCm,
+                        latest.bodyWaterPct
+                    )
                 )
 
                 RangeBar(
@@ -543,7 +548,8 @@ private fun ProgressCard(items: List<Measurement>) {
         Triple("Wrist", "cm", Triple(current.wristCm, previous.wristCm, first.wristCm)),
         Triple("Hip", "cm", Triple(current.hipCm, previous.hipCm, first.hipCm)),
         Triple("Neck", "cm", Triple(current.neckCm, previous.neckCm, first.neckCm)),
-        Triple("Body fat", "%", Triple(current.bodyFatPct, previous.bodyFatPct, first.bodyFatPct))
+        Triple("Body fat", "%", Triple(current.bodyFatPct, previous.bodyFatPct, first.bodyFatPct)),
+        Triple("Body water", "%", Triple(current.bodyWaterPct, previous.bodyWaterPct, first.bodyWaterPct))
     ).filter { it.third.first != null }
 
     AnalysisCard(
@@ -771,7 +777,13 @@ private fun AnalysisCard(
  * [BodyAnalysis.skeletalMuscleKg] for why it is deliberately not tracked.
  */
 @Composable
-private fun MuscleEstimate(sex: Sex, muscleKg: Double?, weightKg: Double) {
+private fun MuscleEstimate(
+    sex: Sex,
+    muscleKg: Double?,
+    weightKg: Double,
+    bodyWaterPct: Double?,
+    waterRatio: Double?
+) {
     if (muscleKg == null) {
         Text(
             stringResource(R.string.analysis_muscle_needs_age),
@@ -780,10 +792,14 @@ private fun MuscleEstimate(sex: Sex, muscleKg: Double?, weightKg: Double) {
         )
         return
     }
-    val pct = BodyAnalysis.musclePercent(muscleKg, weightKg) ?: return
+    // With a usable body-water reading the estimate reflects build, not just
+    // size; without one it is the plain population figure.
+    val adjusted = waterRatio?.let { BodyAnalysis.waterAdjustedMuscleKg(muscleKg, it, weightKg) }
+    val shown = adjusted ?: muscleKg
+    val pct = BodyAnalysis.musclePercent(shown, weightKg) ?: return
     val avg = BodyAnalysis.averageMusclePercent(sex)
-    val low = (muscleKg - BodyAnalysis.MUSCLE_SEE_KG).coerceAtLeast(0.0)
-    val high = muscleKg + BodyAnalysis.MUSCLE_SEE_KG
+    val low = (shown - BodyAnalysis.MUSCLE_SEE_KG).coerceAtLeast(0.0)
+    val high = shown + BodyAnalysis.MUSCLE_SEE_KG
 
     Column {
         Row(
@@ -793,7 +809,7 @@ private fun MuscleEstimate(sex: Sex, muscleKg: Double?, weightKg: Double) {
         ) {
             Text(stringResource(R.string.analysis_muscle), style = MaterialTheme.typography.bodyMedium)
             Text(
-                "\u2248 ${BodyAnalysis.format1(muscleKg)} kg",
+                "\u2248 ${BodyAnalysis.format1(shown)} kg",
                 style = MaterialTheme.typography.titleMedium,
                 color = Strong
             )
@@ -829,6 +845,28 @@ private fun MuscleEstimate(sex: Sex, muscleKg: Double?, weightKg: Double) {
             ),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.outline
+        )
+        Spacer(Modifier.height(4.dp))
+        val waterNote = when {
+            adjusted != null && waterRatio != null -> {
+                val diff = ((waterRatio - 1.0) * 100).roundToInt()
+                stringResource(
+                    R.string.analysis_muscle_water_adjusted,
+                    if (diff > 0) "+$diff" else "$diff",
+                    BodyAnalysis.format1(muscleKg)
+                )
+            }
+            // A reading was entered but is outside the plausible span.
+            bodyWaterPct != null -> stringResource(
+                R.string.analysis_muscle_water_ignored,
+                BodyAnalysis.format1(bodyWaterPct)
+            )
+            else -> stringResource(R.string.analysis_muscle_water_missing)
+        }
+        Text(
+            waterNote,
+            style = MaterialTheme.typography.labelSmall,
+            color = if (adjusted != null) Strong else MaterialTheme.colorScheme.outline
         )
     }
 }

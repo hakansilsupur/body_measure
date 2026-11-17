@@ -23,6 +23,8 @@
     <string name="calf_cm">Calf (cm)</string>
     <string name="wrist_cm">Wrist (cm)</string>
     <string name="shoulder_cm">Shoulder (cm)</string>
+    <string name="body_water_pct">Body water (%)</string>
+    <string name="body_water_hint">Optional, from a smart scale. Weigh at the same time of day, before eating, drinking or exercise.</string>
     <string name="neck_cm">Neck (cm)</string>
 
     <string name="save">Save</string>
@@ -82,12 +84,15 @@
     <string name="analysis_fat_mass">Fat mass</string>
     <string name="analysis_fat_mass_help">Your weight multiplied by body-fat percentage.</string>
     <string name="analysis_composition">Body composition</string>
-    <string name="analysis_composition_help">Lean mass is everything that isn\'t fat — muscle, bone, organs and water. A tape measure can\'t separate muscle from the rest, so this is the closest honest figure.\n\nThe bars place each number on its reference scale, and the middle band means something different on each. For BMI it is the WHO healthy range, not the average: most adults sit above it. For body fat it is the ACE \"average\" band. For FFMI (lean mass scaled to height, the usual stand-in for \"how muscular am I\") it is the typical untrained range; around 25 for men or 19 for women is near the drug-free ceiling.\n\nBMI can\'t tell muscle from fat, so a muscular person can read \"over\" while being lean — which is why it sits next to body fat and FFMI here rather than on its own.\n\nSkeletal muscle is the only figure here not built from your tape measurements. It comes from a population equation (Lee et al., 2000, checked against MRI): what people of your sex, age, height and weight typically carry, give or take about 2.8 kg. It cannot tell muscle from fat — a kilo of fat gained raises it as much as a kilo of muscle — so use it as a one-off ballpark, not something to track. FFMI is the one that follows your actual measurements. The equation also has a small ethnicity adjustment the app does not ask about.</string>
+    <string name="analysis_composition_help">Lean mass is everything that isn\'t fat — muscle, bone, organs and water. A tape measure can\'t separate muscle from the rest, so this is the closest honest figure.\n\nThe bars place each number on its reference scale, and the middle band means something different on each. For BMI it is the WHO healthy range, not the average: most adults sit above it. For body fat it is the ACE \"average\" band. For FFMI (lean mass scaled to height, the usual stand-in for \"how muscular am I\") it is the typical untrained range; around 25 for men or 19 for women is near the drug-free ceiling.\n\nBMI can\'t tell muscle from fat, so a muscular person can read \"over\" while being lean — which is why it sits next to body fat and FFMI here rather than on its own.\n\nSkeletal muscle is the only figure here not built from your tape measurements. It comes from a population equation (Lee et al., 2000, checked against MRI): what people of your sex, age, height and weight typically carry, give or take about 2.8 kg. On its own it cannot tell muscle from fat: a kilo of fat gained raises it as much as a kilo of muscle. Entering body water from a smart scale fixes much of that. Lean tissue is about 73% water and fat holds very little, so the app compares your reading with what a typical person of your size carries (the Watson equations) and scales the muscle estimate by the difference. Scale water readings swing with hydration by a kilo or two within a day, so only readings taken under the same conditions are comparable. The equation also has a small ethnicity adjustment the app does not ask about.</string>
     <string name="analysis_muscle">Skeletal muscle (estimate)</string>
     <string name="analysis_muscle_pct">%1$s%% of body weight</string>
     <string name="analysis_muscle_range">likely %1$s–%2$s kg</string>
     <string name="analysis_muscle_avg_male">Tick: average adult man, %1$s%% (MRI study)</string>
     <string name="analysis_muscle_avg_female">Tick: average adult woman, %1$s%% (MRI study)</string>
+    <string name="analysis_muscle_water_adjusted">Adjusted for body water: %1$s%% vs typical for your size (%2$s kg before adjusting)</string>
+    <string name="analysis_muscle_water_ignored">Body water of %1$s%% looks implausible (expected 35–75%%), so it wasn\'t used</string>
+    <string name="analysis_muscle_water_missing">Add body water from a smart scale to account for your build</string>
     <string name="analysis_muscle_needs_age">Add your age on the Record tab to estimate skeletal muscle</string>
     <string name="analysis_composition_needs">Add %1$s to add body fat and FFMI here</string>
 
@@ -154,6 +159,7 @@
     <string name="trends_calf">Calf (cm) over time</string>
     <string name="trends_wrist">Wrist (cm) over time</string>
     <string name="trends_shoulder">Shoulder (cm) over time</string>
+    <string name="trends_body_water">Body water (%) over time</string>
     <string name="trends_hip">Hip (cm) over time</string>
     <string name="trends_neck">Neck (cm) over time</string>
 

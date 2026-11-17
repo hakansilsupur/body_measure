@@ -70,6 +70,7 @@ fun TrendsScreen(items: List<Measurement>) {
             BodyAnalysis::format1
         ),
         ChartSpec(stringResource(R.string.trends_bmr), pointsOf { it.bmrKcal }, tertiary) { Bmr.format(it) },
+        ChartSpec(stringResource(R.string.trends_body_water), pointsOf { it.bodyWaterPct }, secondary) { "${BodyAnalysis.format1(it)}%" },
         ChartSpec(stringResource(R.string.trends_waist), pointsOf { it.waistCm }, secondary, cm),
         ChartSpec(stringResource(R.string.trends_shoulder), pointsOf { it.shoulderCm }, primary, cm),
         ChartSpec(stringResource(R.string.trends_chest), pointsOf { it.chestCm }, tertiary, cm),

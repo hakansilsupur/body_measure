@@ -19,6 +19,8 @@ data class Measurement(
     val calfCm: Double? = null,
     val wristCm: Double? = null,
     val shoulderCm: Double? = null,
+    /** From a BIA smart scale, as a percentage of body weight. */
+    val bodyWaterPct: Double? = null,
     val neckCm: Double? = null,
     val bmi: Double,
     val bodyFatPct: Double? = null,
