@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -51,6 +52,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.bodymeasure.app.R
+import com.bodymeasure.app.util.BodyAnalysis
 import com.bodymeasure.app.util.ActivityLevel
 import com.bodymeasure.app.util.Bmi
 import com.bodymeasure.app.util.BmiCategory
@@ -139,9 +141,7 @@ fun AddMeasurementScreen(
             label = stringResource(R.string.weight_kg))
         NumberField(value = draft.height, onChange = { draft.height = it },
             label = stringResource(R.string.height_cm))
-        NumberField(value = draft.bodyWater, onChange = { draft.bodyWater = it },
-            label = stringResource(R.string.body_water_pct),
-            supporting = stringResource(R.string.body_water_hint))
+        BodyWaterField(draft)
         NumberField(value = draft.neck, onChange = { draft.neck = it },
             label = stringResource(R.string.neck_cm),
             onInfoClick = { openGuide = MeasurementGuide.Neck })
@@ -423,7 +423,8 @@ private fun NumberField(
     onChange: (String) -> Unit,
     label: String,
     onInfoClick: (() -> Unit)? = null,
-    supporting: String? = null
+    supporting: String? = null,
+    modifier: Modifier = Modifier.fillMaxWidth()
 ) {
     OutlinedTextField(
         value = value,
@@ -450,8 +451,55 @@ private fun NumberField(
                 }
             }
         },
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier
     )
+}
+
+/**
+ * Body water with an explicit kg / % switch, and a live line underneath
+ * showing the value in the other unit. That line is the safeguard: a reading
+ * typed in the wrong unit is still a plausible-looking number, but "48.8% =
+ * 37.2 kg" next to a scale that said 48.8 kg is obviously wrong.
+ */
+@Composable
+private fun BodyWaterField(draft: MeasurementDraft) {
+    val weight = draft.weight.toDoubleOrNull()?.takeIf { it > 0 }
+    val pct = weight?.let { draft.bodyWaterPercentOf(it) }
+    val hint = when {
+        draft.bodyWater.isBlank() -> stringResource(R.string.body_water_hint)
+        pct == null -> stringResource(R.string.body_water_needs_weight)
+        draft.bodyWaterUnit == WaterUnit.Kg -> stringResource(
+            R.string.body_water_as_pct, BodyAnalysis.format1(pct), BodyAnalysis.format1(weight)
+        )
+        else -> stringResource(
+            R.string.body_water_as_kg, BodyAnalysis.format1(pct * weight / 100.0)
+        )
+    }
+    Row(verticalAlignment = Alignment.Top) {
+        NumberField(
+            value = draft.bodyWater,
+            onChange = { draft.bodyWater = it },
+            label = stringResource(
+                if (draft.bodyWaterUnit == WaterUnit.Kg) R.string.body_water_kg
+                else R.string.body_water_pct
+            ),
+            supporting = hint,
+            modifier = Modifier.weight(1f)
+        )
+        Spacer(Modifier.width(8.dp))
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.padding(top = 8.dp)) {
+            SegmentedButton(
+                selected = draft.bodyWaterUnit == WaterUnit.Kg,
+                onClick = { draft.bodyWaterUnit = WaterUnit.Kg },
+                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2)
+            ) { Text("kg") }
+            SegmentedButton(
+                selected = draft.bodyWaterUnit == WaterUnit.Percent,
+                onClick = { draft.bodyWaterUnit = WaterUnit.Percent },
+                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2)
+            ) { Text("%") }
+        }
+    }
 }
 
 @Composable

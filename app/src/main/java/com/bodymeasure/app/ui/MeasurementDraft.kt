@@ -6,6 +6,16 @@ import androidx.compose.runtime.setValue
 import com.bodymeasure.app.data.Measurement
 import com.bodymeasure.app.util.ActivityLevel
 import com.bodymeasure.app.util.Sex
+import kotlin.math.roundToLong
+
+/**
+ * How the body-water field is read. Devices disagree: many scales show a
+ * percentage of body weight, while Samsung Health (Galaxy Watch) shows
+ * kilograms. Both are plausible numbers for the other unit — 48.8 kg of water
+ * typed into a % field reads as a perfectly believable 48.8% — so the user
+ * picks the unit explicitly rather than the app guessing.
+ */
+enum class WaterUnit { Kg, Percent }
 
 /**
  * Mutable in-progress state of the Record form.
@@ -33,6 +43,14 @@ class MeasurementDraft {
     var wrist by mutableStateOf("")
     var shoulder by mutableStateOf("")
     var bodyWater by mutableStateOf("")
+
+    /**
+     * Sticky across entries like sex and activity: people log from the same
+     * device each time. Switching re-reads the typed number in the new unit
+     * rather than converting it, because switching is how a wrong unit gets
+     * corrected.
+     */
+    var bodyWaterUnit by mutableStateOf(WaterUnit.Kg)
 
     /** File name of the attached progress photo, or null when none is set. */
     var photoFileName by mutableStateOf<String?>(null)
@@ -77,7 +95,13 @@ class MeasurementDraft {
         calf = m.calfCm.toField()
         wrist = m.wristCm.toField()
         shoulder = m.shoulderCm.toField()
-        bodyWater = m.bodyWaterPct.toField()
+        // Stored as a percentage; shown in whichever unit the user works in.
+        bodyWater = when (bodyWaterUnit) {
+            WaterUnit.Percent -> m.bodyWaterPct.toField()
+            WaterUnit.Kg -> m.bodyWaterPct
+                ?.let { (it * m.weightKg / 100.0 * 10).roundToLong() / 10.0 }
+                .toField()
+        }
         photoFileName = m.photoFileName
     }
 
@@ -101,7 +125,7 @@ class MeasurementDraft {
             calfCm = calf.toDoubleOrNull(),
             wristCm = wrist.toDoubleOrNull(),
             shoulderCm = shoulder.toDoubleOrNull(),
-            bodyWaterPct = bodyWater.toDoubleOrNull(),
+            bodyWaterPct = bodyWaterPercentOf(w),
             neckCm = neck.toDoubleOrNull(),
             photoFileName = photoFileName
         )
@@ -109,6 +133,19 @@ class MeasurementDraft {
 }
 
 /** Formats a stored value back into an editable field string (drops trailing ".0"). */
+/**
+ * The body-water field as a percentage of [weightKg], whatever unit it was
+ * typed in. Storage is always a percentage, so entries stay comparable however
+ * the user's devices report it.
+ */
+internal fun MeasurementDraft.bodyWaterPercentOf(weightKg: Double): Double? {
+    val v = bodyWater.toDoubleOrNull()?.takeIf { it > 0 } ?: return null
+    return when (bodyWaterUnit) {
+        WaterUnit.Percent -> v
+        WaterUnit.Kg -> if (weightKg > 0) v / weightKg * 100.0 else null
+    }
+}
+
 internal fun Double?.toField(): String = when {
     this == null -> ""
     this % 1.0 == 0.0 -> toLong().toString()

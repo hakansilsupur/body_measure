@@ -403,6 +403,22 @@ validated; the one added assumption is that muscle scales in proportion to lean
 tissue, which is conservative, since muscle is the part of lean tissue that
 varies most between people.
 
+The field takes **kg or %**, chosen with a switch beside it, because devices
+disagree: many scales show a percentage, while Samsung Health on a Galaxy Watch
+shows kilograms. Either unit's number is plausible in the other — 48.8 kg typed
+as 48.8 % would silently read as 37 kg of water at 76 kg body weight — so the
+app does not guess. A line under the field shows the value converted to the
+other unit as you type, which makes a wrong unit obvious. Storage is always a
+percentage of that entry's weight, and History shows both.
+
+Muscle, fat and water from a scale or watch **overlap and will sum to more
+than body weight**. The body divides into fat and lean mass only; muscle is part
+of lean mass and is itself about three-quarters water, which body water counts
+again. One reading of 76.2 kg weight, 36.6 kg muscle, 9.7 kg fat and 48.8 kg
+water sums to 95.1 kg, yet is internally consistent: 48.8 kg is 73.4 % of the
+66.5 kg lean mass, the textbook hydration of lean tissue. The app never adds
+these together; water is used only as a proxy for lean tissue, as above.
+
 Two caveats: consumer scales infer body water from electrical impedance rather
 than measuring it, and hydration moves the reading by a kilo or two within a
 day. Only readings taken under the same conditions are comparable. A reading
