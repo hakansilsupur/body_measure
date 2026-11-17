@@ -97,6 +97,8 @@
     <string name="analysis_muscle_water_adjusted">Adjusted for body water: %1$s%% vs typical for your size (%2$s kg before adjusting)</string>
     <string name="analysis_muscle_water_ignored">Body water of %1$s%% looks implausible (expected 35–75%%), so it wasn\'t used</string>
     <string name="analysis_muscle_water_missing">Add body water from a smart scale to account for your build</string>
+    <string name="history_muscle_water">Muscle ≈ %1$s kg · %2$s%% of weight — water-adjusted</string>
+    <string name="history_muscle_estimate">Muscle ≈ %1$s kg · %2$s%% of weight — estimate</string>
     <string name="analysis_muscle_needs_age">Add your age on the Record tab to estimate skeletal muscle</string>
     <string name="analysis_composition_needs">Add %1$s to add body fat and FFMI here</string>
 

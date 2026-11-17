@@ -124,6 +124,16 @@ private fun MeasurementRow(m: Measurement, onDelete: () -> Unit, onEdit: () -> U
         }
     } ?: ("" to Color.Unspecified)
 
+    // Same estimate as the Analysis card, so the two never disagree: the Lee
+    // equation, corrected by this entry's body water when it has a usable one.
+    val muscleBase = BodyAnalysis.skeletalMuscleKg(sex, m.ageYears, m.weightKg, m.heightCm)
+    val waterRatio = BodyAnalysis.waterRatio(sex, m.ageYears, m.weightKg, m.heightCm, m.bodyWaterPct)
+    val muscleAdjusted = muscleBase?.let { base ->
+        waterRatio?.let { BodyAnalysis.waterAdjustedMuscleKg(base, it, m.weightKg) }
+    }
+    val muscle = muscleAdjusted ?: muscleBase
+    val musclePct = muscle?.let { BodyAnalysis.musclePercent(it, m.weightKg) }
+
     val df = rememberDateFormat()
 
     Card(
@@ -180,6 +190,18 @@ private fun MeasurementRow(m: Measurement, onDelete: () -> Unit, onEdit: () -> U
                                 "FFMI ${BodyAnalysis.format1(ffmi)} \u2014 $ffmiLabel",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = ffmiColor
+                            )
+                        }
+                        if (muscle != null && musclePct != null) {
+                            Text(
+                                stringResource(
+                                    if (muscleAdjusted != null) R.string.history_muscle_water
+                                    else R.string.history_muscle_estimate,
+                                    BodyAnalysis.format1(muscle),
+                                    BodyAnalysis.format1(musclePct)
+                                ),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MuscleTeal
                             )
                         }
                         m.bmrKcal?.let { bmr ->
@@ -255,6 +277,9 @@ private fun MeasurementRow(m: Measurement, onDelete: () -> Unit, onEdit: () -> U
         )
     }
 }
+
+/** Matches the teal the Analysis card uses for muscle and lean mass. */
+private val MuscleTeal = Color(0xFF26A69A)
 
 /** Compact "LABEL value" pair for the collapsed card. */
 @Composable
