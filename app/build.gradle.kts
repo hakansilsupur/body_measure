@@ -20,7 +20,7 @@ ksp {
  * can install successfully and still report itself as out of date — and the app
  * then prompts for the same version forever.
  */
-val appVersionName = "1.3.1"
+val appVersionName = "1.3.2"
 
 fun versionCodeFrom(name: String): Int {
     val parts = name.split(".")
