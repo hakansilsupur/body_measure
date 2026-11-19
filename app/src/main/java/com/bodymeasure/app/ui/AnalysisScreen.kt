@@ -792,10 +792,21 @@ private fun MuscleEstimate(
         )
         return
     }
-    // With a usable body-water reading the estimate reflects build, not just
-    // size; without one it is the plain population figure.
-    val adjusted = waterRatio?.let { BodyAnalysis.waterAdjustedMuscleKg(muscleKg, it, weightKg) }
-    val shown = adjusted ?: muscleKg
+    // Muscle is shown only when this entry has a usable body-water reading.
+    // Without one the equation sees nothing but size, and the user asked for
+    // muscle to come from their watch's water, not from size alone.
+    val shown = waterRatio?.let { BodyAnalysis.waterAdjustedMuscleKg(muscleKg, it, weightKg) }
+    if (shown == null || waterRatio == null) {
+        Text(
+            if (bodyWaterPct != null) stringResource(
+                R.string.analysis_muscle_water_ignored,
+                BodyAnalysis.format1(bodyWaterPct)
+            ) else stringResource(R.string.analysis_muscle_water_missing),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.outline
+        )
+        return
+    }
     val pct = BodyAnalysis.musclePercent(shown, weightKg) ?: return
     val avg = BodyAnalysis.averageMusclePercent(sex)
     val low = (shown - BodyAnalysis.MUSCLE_SEE_KG).coerceAtLeast(0.0)
@@ -847,26 +858,15 @@ private fun MuscleEstimate(
             color = MaterialTheme.colorScheme.outline
         )
         Spacer(Modifier.height(4.dp))
-        val waterNote = when {
-            adjusted != null && waterRatio != null -> {
-                val diff = ((waterRatio - 1.0) * 100).roundToInt()
-                stringResource(
-                    R.string.analysis_muscle_water_adjusted,
-                    if (diff > 0) "+$diff" else "$diff",
-                    BodyAnalysis.format1(muscleKg)
-                )
-            }
-            // A reading was entered but is outside the plausible span.
-            bodyWaterPct != null -> stringResource(
-                R.string.analysis_muscle_water_ignored,
-                BodyAnalysis.format1(bodyWaterPct)
-            )
-            else -> stringResource(R.string.analysis_muscle_water_missing)
-        }
+        val diff = ((waterRatio - 1.0) * 100).roundToInt()
         Text(
-            waterNote,
+            stringResource(
+                R.string.analysis_muscle_water_adjusted,
+                if (diff > 0) "+$diff" else "$diff",
+                BodyAnalysis.format1(muscleKg)
+            ),
             style = MaterialTheme.typography.labelSmall,
-            color = if (adjusted != null) Strong else MaterialTheme.colorScheme.outline
+            color = Strong
         )
     }
 }

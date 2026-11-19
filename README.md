@@ -367,8 +367,9 @@ and water needs DEXA, MRI or a BIA scale. What your tape measurements support is
 **lean mass** (everything that isn't fat) and **FFMI**, the metric normally used
 as a proxy for muscularity.
 
-The Body composition card does show an approximate **skeletal muscle** figure,
-but it comes from somewhere else: the Lee et al. (2000) equation, which predicts
+The Body composition card and History show an approximate **skeletal
+muscle** figure, **only for entries that have a body-water reading**. It comes
+from somewhere other than the tape: the Lee et al. (2000) equation, which predicts
 whole-body skeletal muscle from sex, age, height and weight and was validated
 against MRI (R² 0.86, standard error 2.8 kg):
 
@@ -383,9 +384,10 @@ MRI-measured adult average (38.4 % for men, 30.6 % for women; Janssen et al.
 Its limitation decides how it is shown. On its own the equation cannot see
 body composition: two people of the same sex, age, height and weight get the
 same answer whatever they are made of, and a kilo of fat gained raises it
-exactly as much as a kilo of muscle. So it is not charted in Trends and has no
-change-since-last-entry. FFMI, built from your own measurements, is the figure
-to track.
+exactly as much as a kilo of muscle. So the size-only figure is never shown on its
+own; an entry without body water shows a prompt to add it instead of a muscle
+number. Muscle is not charted in Trends and has no change-since-last-entry.
+FFMI, built from your own measurements, is the figure to track.
 
 **Body water** (optional, from a smart scale) removes much of that blind spot.
 Lean tissue is about 73 % water and fat holds very little, so water is a proxy

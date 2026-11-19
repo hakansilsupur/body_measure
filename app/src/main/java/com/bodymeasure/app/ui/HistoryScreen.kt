@@ -131,7 +131,8 @@ private fun MeasurementRow(m: Measurement, onDelete: () -> Unit, onEdit: () -> U
     val muscleAdjusted = muscleBase?.let { base ->
         waterRatio?.let { BodyAnalysis.waterAdjustedMuscleKg(base, it, m.weightKg) }
     }
-    val muscle = muscleAdjusted ?: muscleBase
+    // Only with body water: without it there is no muscle figure to show.
+    val muscle = muscleAdjusted
     val musclePct = muscle?.let { BodyAnalysis.musclePercent(it, m.weightKg) }
 
     val df = rememberDateFormat()
@@ -195,8 +196,7 @@ private fun MeasurementRow(m: Measurement, onDelete: () -> Unit, onEdit: () -> U
                         if (muscle != null && musclePct != null) {
                             Text(
                                 stringResource(
-                                    if (muscleAdjusted != null) R.string.history_muscle_water
-                                    else R.string.history_muscle_estimate,
+                                    R.string.history_muscle_water,
                                     BodyAnalysis.format1(muscle),
                                     BodyAnalysis.format1(musclePct)
                                 ),
