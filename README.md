@@ -386,7 +386,7 @@ body composition: two people of the same sex, age, height and weight get the
 same answer whatever they are made of, and a kilo of fat gained raises it
 exactly as much as a kilo of muscle. So the size-only figure is never shown on its
 own; an entry without body water shows a prompt to add it instead of a muscle
-number. Trends charts muscle as a share of body weight, again only for entries
+number. Trends charts muscle weight in kg, again only for entries
 with body water — so the line follows your build rather than your weight. It
 still carries the scale's hydration noise, so compare readings taken under the
 same conditions. FFMI, built from your tape measurements, remains the steadier
@@ -572,7 +572,7 @@ The **Trends** tab stacks one line chart per value, derived metrics first:
 3. Body-fat % (only entries where it could be computed)
 4. FFMI
 5. BMR (kcal/day)
-6. Muscle (% of body weight) — only entries with body water; see the muscle
+6. Muscle (kg) — only entries with body water; see the muscle
    section above. It replaced a plain body-water chart, since water is an input
    to this figure rather than something worth tracking on its own.
 7. Each circumference recorded — waist, shoulder, chest, arm, thigh, calf, wrist, hip, neck

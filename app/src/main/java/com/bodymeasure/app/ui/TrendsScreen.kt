@@ -71,17 +71,18 @@ fun TrendsScreen(items: List<Measurement>) {
             BodyAnalysis::format1
         ),
         ChartSpec(stringResource(R.string.trends_bmr), pointsOf { it.bmrKcal }, tertiary) { Bmr.format(it) },
-        // Muscle as a share of body weight, only for entries with body water —
-        // the same figure History shows, from the same function.
+        // Muscle weight, only for entries with body water — the same figure
+        // History shows, from the same function. Kilograms rather than a share
+        // of body weight, so losing fat does not read as gaining muscle.
         ChartSpec(
             stringResource(R.string.trends_muscle),
             pointsOf { m ->
                 val sex = runCatching { Sex.valueOf(m.sex) }.getOrDefault(Sex.Male)
                 BodyAnalysis.muscleFromWaterKg(sex, m.ageYears, m.weightKg, m.heightCm, m.bodyWaterPct)
-                    ?.let { BodyAnalysis.musclePercent(it, m.weightKg) }
             },
-            FfmiTeal
-        ) { "${BodyAnalysis.format1(it)}%" },
+            FfmiTeal,
+            kg
+        ),
         ChartSpec(stringResource(R.string.trends_waist), pointsOf { it.waistCm }, secondary, cm),
         ChartSpec(stringResource(R.string.trends_shoulder), pointsOf { it.shoulderCm }, primary, cm),
         ChartSpec(stringResource(R.string.trends_chest), pointsOf { it.chestCm }, tertiary, cm),
