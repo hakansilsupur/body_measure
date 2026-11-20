@@ -126,13 +126,8 @@ private fun MeasurementRow(m: Measurement, onDelete: () -> Unit, onEdit: () -> U
 
     // Same estimate as the Analysis card, so the two never disagree: the Lee
     // equation, corrected by this entry's body water when it has a usable one.
-    val muscleBase = BodyAnalysis.skeletalMuscleKg(sex, m.ageYears, m.weightKg, m.heightCm)
-    val waterRatio = BodyAnalysis.waterRatio(sex, m.ageYears, m.weightKg, m.heightCm, m.bodyWaterPct)
-    val muscleAdjusted = muscleBase?.let { base ->
-        waterRatio?.let { BodyAnalysis.waterAdjustedMuscleKg(base, it, m.weightKg) }
-    }
     // Only with body water: without it there is no muscle figure to show.
-    val muscle = muscleAdjusted
+    val muscle = BodyAnalysis.muscleFromWaterKg(sex, m.ageYears, m.weightKg, m.heightCm, m.bodyWaterPct)
     val musclePct = muscle?.let { BodyAnalysis.musclePercent(it, m.weightKg) }
 
     val df = rememberDateFormat()

@@ -68,11 +68,9 @@ object BodyAnalysis {
      * Its blind spot matters more than its error bar: it cannot see body
      * composition. Two people of the same sex, age, height and weight get the
      * same answer whatever they are made of, and gaining a kilo of fat raises
-     * the estimate exactly as much as a kilo of muscle would. So it is a
-     * one-off ballpark, never a trend — which is why it is not charted and has
-     * no "change since last entry". FFMI, which does use your measurements, is
-     * the figure to track. A body-water reading removes much of this blind
-     * spot; see [waterAdjustedMuscleKg].
+     * the estimate exactly as much as a kilo of muscle would. So the app never
+     * shows it on its own: only corrected by body water, through
+     * [muscleFromWaterKg], which is also the only form that is charted.
      *
      * Null without an age, since age is a term in the equation.
      */
@@ -149,6 +147,23 @@ object BodyAnalysis {
      */
     fun waterAdjustedMuscleKg(muscleKg: Double, ratio: Double, weightKg: Double): Double? =
         (muscleKg * ratio).takeIf { it.isFinite() && it > 0 && it < weightKg }
+
+    /**
+     * The muscle figure the app shows: [skeletalMuscleKg] corrected by body
+     * water, and null whenever there is no usable body-water reading. One
+     * function so History, Trends and Analysis cannot drift apart.
+     */
+    fun muscleFromWaterKg(
+        sex: Sex,
+        ageYears: Int?,
+        weightKg: Double,
+        heightCm: Double,
+        bodyWaterPct: Double?
+    ): Double? {
+        val base = skeletalMuscleKg(sex, ageYears, weightKg, heightCm) ?: return null
+        val ratio = waterRatio(sex, ageYears, weightKg, heightCm, bodyWaterPct) ?: return null
+        return waterAdjustedMuscleKg(base, ratio, weightKg)
+    }
 
     fun musclePercent(muscleKg: Double, weightKg: Double): Double? =
         if (weightKg > 0) muscleKg / weightKg * 100.0 else null

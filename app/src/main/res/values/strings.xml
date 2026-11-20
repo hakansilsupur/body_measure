@@ -164,7 +164,7 @@
     <string name="trends_calf">Calf (cm) over time</string>
     <string name="trends_wrist">Wrist (cm) over time</string>
     <string name="trends_shoulder">Shoulder (cm) over time</string>
-    <string name="trends_body_water">Body water (%) over time</string>
+    <string name="trends_muscle">Muscle (% of weight) over time</string>
     <string name="trends_hip">Hip (cm) over time</string>
     <string name="trends_neck">Neck (cm) over time</string>
 

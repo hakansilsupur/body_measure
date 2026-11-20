@@ -21,6 +21,7 @@ import com.bodymeasure.app.util.Bmi
 import com.bodymeasure.app.util.Bmr
 import com.bodymeasure.app.util.BodyAnalysis
 import com.bodymeasure.app.util.BodyFat
+import com.bodymeasure.app.util.Sex
 
 /** Matches the teal the Analysis tab uses for FFMI, so the two read as one metric. */
 private val FfmiTeal = Color(0xFF26A69A)
@@ -70,7 +71,17 @@ fun TrendsScreen(items: List<Measurement>) {
             BodyAnalysis::format1
         ),
         ChartSpec(stringResource(R.string.trends_bmr), pointsOf { it.bmrKcal }, tertiary) { Bmr.format(it) },
-        ChartSpec(stringResource(R.string.trends_body_water), pointsOf { it.bodyWaterPct }, secondary) { "${BodyAnalysis.format1(it)}%" },
+        // Muscle as a share of body weight, only for entries with body water —
+        // the same figure History shows, from the same function.
+        ChartSpec(
+            stringResource(R.string.trends_muscle),
+            pointsOf { m ->
+                val sex = runCatching { Sex.valueOf(m.sex) }.getOrDefault(Sex.Male)
+                BodyAnalysis.muscleFromWaterKg(sex, m.ageYears, m.weightKg, m.heightCm, m.bodyWaterPct)
+                    ?.let { BodyAnalysis.musclePercent(it, m.weightKg) }
+            },
+            FfmiTeal
+        ) { "${BodyAnalysis.format1(it)}%" },
         ChartSpec(stringResource(R.string.trends_waist), pointsOf { it.waistCm }, secondary, cm),
         ChartSpec(stringResource(R.string.trends_shoulder), pointsOf { it.shoulderCm }, primary, cm),
         ChartSpec(stringResource(R.string.trends_chest), pointsOf { it.chestCm }, tertiary, cm),

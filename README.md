@@ -19,7 +19,7 @@ hip, thigh, neck) and automatically calculate BMI with a category indicator.
   picked.
 - Live BMI / body-fat / BMR / TDEE preview card as you type.
 - **Trends tab** charting every recorded value over time — BMI, weight, body
-  fat, FFMI, BMR, and each circumference (waist, shoulder, chest, arm,
+  fat, FFMI, BMR, muscle (where body water is given), and each circumference (waist, shoulder, chest, arm,
   thigh, calf, wrist, hip, neck).
 - **Analysis tab**: lean/fat mass, FFMI, waist-to-height, waist-to-hip and
   healthy weight range, all derived from what you already entered.
@@ -386,8 +386,11 @@ body composition: two people of the same sex, age, height and weight get the
 same answer whatever they are made of, and a kilo of fat gained raises it
 exactly as much as a kilo of muscle. So the size-only figure is never shown on its
 own; an entry without body water shows a prompt to add it instead of a muscle
-number. Muscle is not charted in Trends and has no change-since-last-entry.
-FFMI, built from your own measurements, is the figure to track.
+number. Trends charts muscle as a share of body weight, again only for entries
+with body water — so the line follows your build rather than your weight. It
+still carries the scale's hydration noise, so compare readings taken under the
+same conditions. FFMI, built from your tape measurements, remains the steadier
+figure to track.
 
 **Body water** (optional, from a smart scale) removes much of that blind spot.
 Lean tissue is about 73 % water and fat holds very little, so water is a proxy
@@ -569,7 +572,10 @@ The **Trends** tab stacks one line chart per value, derived metrics first:
 3. Body-fat % (only entries where it could be computed)
 4. FFMI
 5. BMR (kcal/day)
-6. Each circumference recorded — waist, shoulder, chest, arm, thigh, calf, wrist, hip, neck
+6. Muscle (% of body weight) — only entries with body water; see the muscle
+   section above. It replaced a plain body-water chart, since water is an input
+   to this figure rather than something worth tracking on its own.
+7. Each circumference recorded — waist, shoulder, chest, arm, thigh, calf, wrist, hip, neck
 
 A chart is skipped entirely when you have never recorded that value, rather than
 showing an empty card for every field you don't track.
